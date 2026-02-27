@@ -7,7 +7,10 @@ const OnboardingFlow = React.lazy(() => import('./pages/OnboardingFlow'));
 const PracticeArena = React.lazy(() => import('./pages/PracticeArena'));
 const CurriculumPage = React.lazy(() => import('./pages/CurriculumPage'));
 const ParentDashboard = React.lazy(() => import('./pages/dashboard/ParentDashboard'));
+const AccountSettings = React.lazy(() => import('./pages/dashboard/AccountSettings'));
 const StudentSignup = React.lazy(() => import('./pages/StudentSignup'));
+const ParentSignup = React.lazy(() => import('./pages/ParentSignup'));
+const VerifyEmail = React.lazy(() => import('./pages/VerifyEmail'));
 
 function App() {
   return (
@@ -18,9 +21,11 @@ function App() {
           <Route path="/onboarding" element={<OnboardingFlow />} />
           <Route path="/practice" element={<PracticeArena />} />
           <Route path="/curriculum/:regionId" element={<CurriculumPage />} />
-          {/* Dashboard & Auth Routes */}
           <Route path="/dashboard/parent" element={<ParentDashboard />} />
+          <Route path="/dashboard/settings" element={<AccountSettings />} />
           <Route path="/student-join" element={<StudentSignup />} />
+          <Route path="/signup/parent" element={<ParentSignup />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
         </Routes>
       </Suspense>
     </Router>
