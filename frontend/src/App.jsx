@@ -11,6 +11,7 @@ const AccountSettings = React.lazy(() => import('./pages/dashboard/AccountSettin
 const StudentSignup = React.lazy(() => import('./pages/StudentSignup'));
 const ParentSignup = React.lazy(() => import('./pages/ParentSignup'));
 const VerifyEmail = React.lazy(() => import('./pages/VerifyEmail'));
+const TutorSignup = React.lazy(() => import('./pages/TutorSignup'));
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/student-join" element={<StudentSignup />} />
           <Route path="/signup/parent" element={<ParentSignup />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/tutor-join" element={<TutorSignup />} />
         </Routes>
       </Suspense>
     </Router>
