@@ -6,6 +6,8 @@ const LandingPage = React.lazy(() => import('./pages/LandingPage'));
 const OnboardingFlow = React.lazy(() => import('./pages/OnboardingFlow'));
 const PracticeArena = React.lazy(() => import('./pages/PracticeArena'));
 const CurriculumPage = React.lazy(() => import('./pages/CurriculumPage'));
+const ParentDashboard = React.lazy(() => import('./pages/dashboard/ParentDashboard'));
+const StudentSignup = React.lazy(() => import('./pages/StudentSignup'));
 
 function App() {
   return (
@@ -16,6 +18,9 @@ function App() {
           <Route path="/onboarding" element={<OnboardingFlow />} />
           <Route path="/practice" element={<PracticeArena />} />
           <Route path="/curriculum/:regionId" element={<CurriculumPage />} />
+          {/* Dashboard & Auth Routes */}
+          <Route path="/dashboard/parent" element={<ParentDashboard />} />
+          <Route path="/student-join" element={<StudentSignup />} />
         </Routes>
       </Suspense>
     </Router>
