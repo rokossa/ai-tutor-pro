@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: ai-tutor-api
+    env: node
+    plan: starter
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+  
+  - type: web
+    name: ai-tutor-frontend
+    env: static
+    plan: starter
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://ai-tutor-api.onrender.com/api
+      - key: VITE_STRIPE_PUBLIC_KEY
+        sync: false
+
+  - type: worker
+    name: ai-tutor-cron
+    env: node
+    plan: starter
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node services/cron-jobs.js
+    envVars:
+      - key: MONGO_URI
+        sync: false
