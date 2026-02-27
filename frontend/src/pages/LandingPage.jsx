@@ -32,7 +32,7 @@ export default function LandingPage() {
           {t('hero_sub')}
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link to="/onboarding" className="bg-blue-600 text-white font-bold py-4 px-8 rounded-full text-lg hover:bg-blue-700 transition shadow-xl shadow-blue-600/20">
+          <Link to="/signup/parent" className="bg-blue-600 text-white font-bold py-4 px-8 rounded-full text-lg hover:bg-blue-700 transition shadow-xl shadow-blue-600/20">
             {t('start_trial')}
           </Link>
           <a href="#pricing" className="bg-white text-slate-700 font-bold py-4 px-8 rounded-full text-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition shadow-sm">
@@ -115,7 +115,7 @@ export default function LandingPage() {
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Bilingual Feedback (EN/FR)</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Weekly Progress Emails</li>
               </ul>
-              <Link to="/onboarding" className="block text-center bg-white text-slate-900 font-bold py-3 rounded-lg hover:bg-slate-200 transition">Start Free Trial</Link>
+              <Link to="/signup/parent" className="block text-center bg-white text-slate-900 font-bold py-3 rounded-lg hover:bg-slate-200 transition">Start Free Trial</Link>
             </div>
             
             {/* Annual Tier */}
@@ -129,7 +129,7 @@ export default function LandingPage() {
                 <li className="flex items-center gap-2"><span className="text-blue-300">✓</span> Priority Support</li>
                 <li className="flex items-center gap-2"><span className="text-blue-300">✓</span> Access to AP/IB Tracks</li>
               </ul>
-              <Link to="/onboarding" className="block text-center bg-white text-blue-900 font-bold py-3 rounded-lg hover:bg-blue-50 transition shadow-lg">Start Free Trial</Link>
+              <Link to="/signup/parent" className="block text-center bg-white text-blue-900 font-bold py-3 rounded-lg hover:bg-blue-50 transition shadow-lg">Start Free Trial</Link>
             </div>
           </div>
         </div>
