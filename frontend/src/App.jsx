@@ -1,46 +1,53 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import './i18n';
+import './i18n/i18n';
 
-// Layouts
 import PublicLayout from './components/layout/PublicLayout';
 
 // 1. Public Pages
 const LandingPage = React.lazy(() => import('./pages/LandingPage'));
-const Pricing = React.lazy(() => import('./pages/public/Pricing'));
 const About = React.lazy(() => import('./pages/public/About'));
 const Mission = React.lazy(() => import('./pages/public/Mission'));
+const Pricing = React.lazy(() => import('./pages/public/Pricing'));
+const Contact = React.lazy(() => import('./pages/public/Contact'));
 const FAQ = React.lazy(() => import('./pages/public/FAQ'));
 const Privacy = React.lazy(() => import('./pages/public/Privacy'));
 const Terms = React.lazy(() => import('./pages/public/Terms'));
-const Contact = React.lazy(() => import('./pages/public/Contact'));
 const NotFound = React.lazy(() => import('./pages/errors/NotFound'));
 
 // 2. Auth Pages
 const ParentSignup = React.lazy(() => import('./pages/ParentSignup'));
-const VerifyEmail = React.lazy(() => import('./pages/VerifyEmail'));
-const AuthSuccess = React.lazy(() => import('./pages/AuthSuccess'));
+const ForgotPassword = React.lazy(() => import('./pages/auth/ForgotPassword'));
+const ResetPassword = React.lazy(() => import('./pages/auth/ResetPassword'));
+const MagicLogin = React.lazy(() => import('./pages/auth/MagicLogin'));
 const StudentSignup = React.lazy(() => import('./pages/StudentSignup'));
-const TutorSignup = React.lazy(() => import('./pages/TutorSignup'));
 
 // 3. Onboarding
 const OnboardingFlow = React.lazy(() => import('./pages/OnboardingFlow'));
 
-// 4. Dashboards & Core App (These provide their own sidebars/layouts)
+// 4. Dashboards & Core Views
 const ParentDashboard = React.lazy(() => import('./pages/dashboard/ParentDashboard'));
+const ChildProfile = React.lazy(() => import('./pages/dashboard/ChildProfile'));
+const WeeklyReports = React.lazy(() => import('./pages/dashboard/WeeklyReports'));
+const Billing = React.lazy(() => import('./pages/dashboard/Billing'));
+
 const StudentDashboard = React.lazy(() => import('./pages/dashboard/StudentDashboard'));
-const TutorDashboard = React.lazy(() => import('./pages/dashboard/TutorDashboard'));
 const CourseView = React.lazy(() => import('./pages/CourseView'));
 const PracticeArena = React.lazy(() => import('./pages/PracticeArena'));
+
+const TutorDashboard = React.lazy(() => import('./pages/dashboard/TutorDashboard'));
+
 const AccountSettings = React.lazy(() => import('./pages/dashboard/AccountSettings'));
+const Notifications = React.lazy(() => import('./pages/shared/Notifications'));
+const SubscriptionExpired = React.lazy(() => import('./pages/shared/SubscriptionExpired'));
 
 function App() {
   return (
     <Router>
-      <Suspense fallback={<div className="flex h-screen items-center justify-center text-indigo-600 font-bold text-xl animate-pulse">Loading Platform...</div>}>
+      <Suspense fallback={<div className="flex h-screen items-center justify-center text-[#4338CA] font-bold text-xl animate-pulse">Loading Platform...</div>}>
         <Routes>
           
-          {/* --- PUBLIC MARKETING ROUTES (Wrapped in PublicLayout for Navbar & Footer) --- */}
+          {/* 1. PUBLIC MARKETING ROUTES (Uses Navbar/Footer) */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<LandingPage />} />
             <Route path="/about" element={<About />} />
@@ -50,45 +57,44 @@ function App() {
             <Route path="/faq" element={<FAQ />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
-            
-            {/* Catch-all 404 inside the layout so it still has nav/footer */}
+            <Route path="/fbl" element={<Navigate to="/" replace />} />
             <Route path="*" element={<NotFound />} />
           </Route>
 
-          {/* --- AUTHENTICATION ROUTES --- */}
-          <Route path="/login" element={<ParentSignup />} /> {/* Merged into signup for now */}
+          {/* 2. AUTHENTICATION ROUTES */}
+          <Route path="/login" element={<ParentSignup />} /> 
           <Route path="/register" element={<ParentSignup />} />
-          <Route path="/signup/parent" element={<Navigate to="/register" replace />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/auth-success" element={<AuthSuccess />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/auth/magic/:token" element={<MagicLogin />} />
           
-          <Route path="/auth/magic/:token" element={<StudentSignup />} />
-          <Route path="/student-join" element={<Navigate to="/auth/magic/demo" replace />} />
-          <Route path="/tutor-join" element={<TutorSignup />} />
-
-          {/* --- ONBOARDING FLOW --- */}
+          {/* 3. ONBOARDING FLOW */}
           <Route path="/onboarding/*" element={<OnboardingFlow />} />
 
-          {/* --- PARENT ROUTES --- */}
+          {/* 4. PARENT EXPERIENCE */}
           <Route path="/parent/dashboard" element={<ParentDashboard />} />
-          <Route path="/dashboard/parent" element={<Navigate to="/parent/dashboard" replace />} />
           <Route path="/parent/children" element={<ParentDashboard />} />
-          <Route path="/parent/billing" element={<AccountSettings />} />
-          <Route path="/settings" element={<AccountSettings />} />
+          <Route path="/parent/child/:childId" element={<ChildProfile />} />
+          <Route path="/parent/reports" element={<WeeklyReports />} />
+          <Route path="/parent/billing" element={<Billing />} />
 
-          {/* --- STUDENT ROUTES --- */}
+          {/* 5. STUDENT EXPERIENCE */}
           <Route path="/student/dashboard" element={<StudentDashboard />} />
-          <Route path="/dashboard/student" element={<Navigate to="/student/dashboard" replace />} />
           <Route path="/practice/courses" element={<StudentDashboard />} />
           <Route path="/practice/:course/chapters" element={<CourseView />} />
-          <Route path="/course/:courseId" element={<Navigate to="/practice/math/chapters" replace />} />
           <Route path="/practice/:course/:chapter" element={<PracticeArena />} />
-          <Route path="/practice" element={<Navigate to="/practice/math/linear-equations" replace />} />
+          <Route path="/student/progress" element={<StudentDashboard />} />
 
-          {/* --- TUTOR ROUTES --- */}
+          {/* 6. TUTOR EXPERIENCE */}
           <Route path="/tutor/dashboard" element={<TutorDashboard />} />
-          <Route path="/dashboard/tutor" element={<Navigate to="/tutor/dashboard" replace />} />
           <Route path="/tutor/students" element={<TutorDashboard />} />
+          <Route path="/tutor/student/:childId" element={<ChildProfile />} />
+
+          {/* 7. SHARED PAGES */}
+          <Route path="/settings" element={<AccountSettings />} />
+          <Route path="/settings/account" element={<AccountSettings />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/subscription-required" element={<SubscriptionExpired />} />
 
         </Routes>
       </Suspense>

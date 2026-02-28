@@ -1,0 +1,30 @@
+{
+  "translation": {
+    "common": {
+      "startFreeTrial": "Commencer l'essai gratuit de 14 jours",
+      "watchDemo": "Regarder la démo de 47 secondes",
+      "login": "Se connecter",
+      "register": "Créer un compte",
+      "continue": "Continuer",
+      "submit": "Soumettre",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "downloadPDF": "Télécharger le rapport PDF",
+      "backToDashboard": "Retour au tableau de bord",
+      "next": "Suivant",
+      "previous": "Précédent",
+      "loading": "Chargement...",
+      "error": "Une erreur s'est produite. Veuillez réessayer."
+    },
+    "home": {
+      "title": "AI Tutor Pro — Le tuteur IA personnel de votre enfant",
+      "hero": {
+        "headline": "Le tuteur IA personnel de votre enfant qui se soucie vraiment ❤️",
+        "subheadline": "Questions d'entraînement instantanées basées sur son programme scolaire exact (États-Unis et Canada). Retours chaleureux étape par étape. Streaks quotidiens. Rapports hebdomadaires aux parents.",
+        "cta": "Commencer l'essai gratuit de 14 jours"
+      },
+      "trusted": "Fait confiance par plus de 4 872 familles aux États-Unis et au Canada",
+      "testimonial": "« Enfin un tuteur IA qui parle comme un vrai professeur — gentil et patient. » — Sarah T., Ontario"
+    }
+  }
+}

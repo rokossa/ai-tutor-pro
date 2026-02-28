@@ -1,0 +1,30 @@
+{
+  "translation": {
+    "common": {
+      "startFreeTrial": "Start 14-Day Free Trial",
+      "watchDemo": "Watch 47-second Demo",
+      "login": "Log In",
+      "register": "Create Account",
+      "continue": "Continue",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "downloadPDF": "Download PDF Report",
+      "backToDashboard": "Back to Dashboard",
+      "next": "Next",
+      "previous": "Previous",
+      "loading": "Loading...",
+      "error": "Something went wrong. Please try again."
+    },
+    "home": {
+      "title": "AI Tutor Pro — Your Child’s Personal AI Tutor",
+      "hero": {
+        "headline": "Your child’s personal AI tutor that actually cares ❤️",
+        "subheadline": "Instant practice questions from their exact local curriculum (US & Canada). Warm, step-by-step feedback. Daily streaks. Weekly parent reports.",
+        "cta": "Start 14-Day Free Trial"
+      },
+      "trusted": "Trusted by 4,872+ families across the US & Canada",
+      "testimonial": "“Finally, an AI tutor that sounds like a real teacher — kind and patient.” — Sarah T., Ontario"
+    }
+  }
+}

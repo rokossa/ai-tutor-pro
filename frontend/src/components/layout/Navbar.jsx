@@ -13,24 +13,34 @@ export default function Navbar() {
     <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+          
+          {/* Logo & Brand */}
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-[#4338CA] rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">A</span>
             </div>
-            <Link to="/" className="text-xl font-bold text-slate-900 tracking-tight">AI Tutor Pro</Link>
+            <span className="text-xl font-bold text-slate-900 tracking-tight">AI Tutor Pro</span>
+          </Link>
+
+          {/* Desktop Links */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link to="/about" className="text-slate-600 hover:text-[#4338CA] font-medium transition">How it works</Link>
+            <Link to="/pricing" className="text-slate-600 hover:text-[#4338CA] font-medium transition">Pricing</Link>
           </div>
-          <div className="hidden md:flex space-x-8">
-            <Link to="/dashboard/parent" className="text-slate-600 hover:text-blue-600 font-medium transition">Dashboard</Link>
-            <Link to="/practice" className="text-slate-600 hover:text-blue-600 font-medium transition">Practice</Link>
-          </div>
+
+          {/* Actions */}
           <div className="flex items-center space-x-4">
-            <button onClick={toggleLanguage} className="text-sm font-bold text-slate-500 hover:text-blue-600 transition px-2">
+            <button onClick={toggleLanguage} className="text-sm font-bold text-slate-500 hover:text-[#4338CA] transition px-2">
               {i18n.language === 'en' ? 'FR' : 'EN'}
             </button>
-            <Link to="/signup/parent" className="bg-slate-900 text-white px-5 py-2 rounded-full font-medium hover:bg-blue-600 transition shadow-sm">
-              {t('start_trial')}
+            <Link to="/login" className="text-slate-600 hover:text-[#4338CA] font-medium transition hidden sm:block">
+              {t('common.login')}
+            </Link>
+            <Link to="/register" className="bg-[#1E1B4B] text-white px-5 py-2 rounded-xl font-bold hover:bg-indigo-900 transition shadow-sm">
+              {t('common.startFreeTrial')}
             </Link>
           </div>
+
         </div>
       </div>
     </nav>
