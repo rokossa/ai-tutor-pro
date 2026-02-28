@@ -1,11 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Navbar from '../components/layout/Navbar';
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#F8F9FA] font-sans">
-      <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 flex flex-col lg:flex-row items-center gap-12">
         <div className="flex-1 text-center lg:text-left z-10">
           <h1 className="text-5xl md:text-6xl font-extrabold text-[#1A1A1A] tracking-tight mb-6 leading-tight">

@@ -37,7 +37,7 @@ export default function Navbar() {
               {t('common.login')}
             </Link>
             <Link to="/register" className="bg-[#1E1B4B] text-white px-5 py-2 rounded-xl font-bold hover:bg-indigo-900 transition shadow-sm">
-              {t('common.startFreeTrial')}
+              {t('common.register')}
             </Link>
           </div>
 
