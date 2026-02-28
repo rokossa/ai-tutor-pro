@@ -1,83 +1,60 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function StudentDashboard() {
+  const { i18n } = useTranslation();
+
+  const toggleLanguage = () => {
+    i18n.changeLanguage(i18n.language === 'en' ? 'fr' : 'en');
+  };
+
+  const courses = [
+    { id: 'math', name: 'Math', icon: '🧮', desc: 'Algebra, Geometry, Trigonometry', frDesc: 'Algèbre, Géométrie, Trigonométrie', color: 'text-blue-600' },
+    { id: 'science', name: 'Science', icon: '🧪', desc: 'Physics, Chemistry, Biology', frDesc: 'Physique, Chimie, Biologie', color: 'text-emerald-600' },
+    { id: 'english', name: 'English', icon: '📖', desc: 'Grammar, Writing, Literature', frDesc: 'Grammaire, Écriture, Littérature', color: 'text-indigo-600' },
+    { id: 'french', name: 'French / Français', icon: '🇫🇷', desc: 'Vocabulary, Conversation', frDesc: 'Vocabulaire, Conversation', color: 'text-red-600' },
+    { id: 'history', name: 'History', icon: '🏛️', desc: 'World History, Canadian History', frDesc: 'Histoire mondiale et canadienne', color: 'text-amber-600' },
+    { id: 'geography', name: 'Geography', icon: '🌍', desc: 'World Geography, Mapping', frDesc: 'Géographie mondiale, Cartographie', color: 'text-teal-600' },
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
-      {/* Student Topbar */}
+    <div className="min-h-screen bg-[#F8F9FA] font-sans">
       <header className="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
-        <h1 className="text-xl font-extrabold text-slate-900">AI Tutor Pro</h1>
-        <div className="flex items-center gap-6">
-          <div className="bg-orange-100 text-orange-700 font-bold px-4 py-1.5 rounded-full text-sm flex items-center gap-2">
-            🔥 5 Day Streak!
-          </div>
-          <div className="flex items-center gap-2 cursor-pointer">
-            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-lg">🏀</div>
-            <span className="font-bold text-slate-700 text-sm hidden md:inline">Alexandre</span>
-          </div>
+        <div className="flex items-center gap-3">
+          <span className="text-lg font-medium text-slate-800">Hi <strong>Alexandre</strong> 💥 • Grade 8 Ontario</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <button onClick={toggleLanguage} className="bg-slate-100 w-12 h-6 rounded-full relative flex items-center px-1 cursor-pointer">
+             <div className={`w-4 h-4 bg-indigo-600 rounded-full transition-transform ${i18n.language === 'fr' ? 'translate-x-6' : ''}`}></div>
+             <span className="absolute left-7 text-[10px] font-bold text-slate-500">{i18n.language === 'fr' ? 'FR' : 'EN'}</span>
+          </button>
+          <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-lg">👦🏽</div>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-10">
-        <Link to="#" className="text-slate-400 hover:text-slate-600 font-bold text-sm flex items-center gap-1 mb-6 transition">
-          ← Back
-        </Link>
-        
-        <h2 className="text-3xl font-bold text-slate-900 mb-8">Grade 8 - Topic: Algebra & Fractions</h2>
+      <main className="max-w-5xl mx-auto px-4 py-12">
+        <h1 className="text-4xl font-extrabold text-slate-900 mb-10 text-center">
+          {i18n.language === 'en' ? 'Choose your Course' : 'Choisis ton Cours'}
+        </h1>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-10">
-          {/* Quick Start Card */}
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center text-center hover:shadow-md transition">
-            <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
+          {courses.map(course => (
+            <div key={course.id} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col items-center text-center">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <span className="text-3xl">{course.icon}</span>
+                <h2 className="text-2xl font-bold text-slate-900">{course.name}</h2>
+              </div>
+              <p className="text-slate-500 text-sm mb-6 h-10">
+                {i18n.language === 'en' ? course.desc : course.frDesc}
+              </p>
+              <Link to={`/course/${course.id}`} className="bg-[#1E1B4B] text-white font-bold py-2.5 px-8 rounded-xl hover:bg-indigo-900 transition shadow-sm w-3/4">
+                {i18n.language === 'en' ? 'Start' : 'Commencer'}
+              </Link>
+              <p className="text-slate-400 text-xs mt-3 font-medium">10+ exercises</p>
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">Continue Daily Practice</h3>
-            <p className="text-slate-500 mb-6 text-sm">You have 9 minutes left to reach your 15-minute goal today.</p>
-            <Link to="/practice" className="bg-blue-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-700 transition">
-              Start Exercise
-            </Link>
-          </div>
-
-          {/* AI Feedback Summary Card */}
-          <div className="bg-emerald-50 border border-emerald-100 p-8 rounded-2xl">
-            <h3 className="text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">Last Session Feedback</h3>
-            <div className="text-4xl font-black text-emerald-600 mb-4">SCORE: 94%</div>
-            <p className="text-emerald-800/80 mb-6 font-medium leading-relaxed">
-              Amazing job on the free-throw percentage questions! You are showing great consistency in simplifying fractions. Let's push further today.
-            </p>
-            <Link to="/practice" className="bg-white text-emerald-700 border border-emerald-200 font-bold py-3 px-6 rounded-xl hover:bg-emerald-50 transition block text-center">
-              Review Errors
-            </Link>
-          </div>
+          ))}
         </div>
-
-        {/* Achievements */}
-        <section>
-          <h3 className="text-lg font-bold text-slate-700 mb-4">My Achievements</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-xl border border-slate-200 flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-xl">🚀</div>
-              <div>
-                <p className="font-bold text-slate-900 text-sm">First Step</p>
-                <p className="text-xs text-emerald-500 font-bold">Unlocked</p>
-              </div>
-            </div>
-            <div className="bg-white p-4 rounded-xl border border-orange-200 bg-orange-50/50 flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center text-xl">🔥</div>
-              <div>
-                <p className="font-bold text-orange-900 text-sm">On Fire</p>
-                <p className="text-xs text-orange-600 font-bold">Unlocked</p>
-              </div>
-            </div>
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center gap-3 opacity-60 grayscale">
-              <div className="w-10 h-10 bg-slate-200 rounded-lg flex items-center justify-center text-xl">🏆</div>
-              <div>
-                <p className="font-bold text-slate-500 text-sm">Math Whiz</p>
-                <p className="text-xs text-slate-400 font-bold">Locked</p>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
     </div>
   );
