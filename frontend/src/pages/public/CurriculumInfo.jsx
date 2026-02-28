@@ -1,10 +1,14 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+
+// Image Imports
+import heroNorthamericaMap from '../../assets/images/hero-northamerica-map.jpg';
+import uiDropdownSelector from '../../assets/images/ui-dropdown-selector.png';
+import uiChapterSplitview from '../../assets/images/ui-chapter-splitview.png';
+import timelineDifficulty from '../../assets/images/timeline-difficulty.png';
+import diverseStudentsMap from '../../assets/images/diverse-students-map.jpg';
 
 export default function CurriculumInfo() {
-  const { t } = useTranslation();
-
   useEffect(() => { 
     document.title = "Curriculum - AI Tutor Pro"; 
   }, []);
@@ -21,10 +25,9 @@ export default function CurriculumInfo() {
           AI Tutor Pro dynamically aligns with 50 US States and 13 Canadian Provinces/Territories to ensure your child is practicing exactly what they will be tested on.
         </p>
         
-        {/* HERO IMAGE PLACEHOLDER (Wide North America Map with glowing pins) */}
-        <div className="w-full aspect-[21/9] bg-indigo-900 rounded-[2rem] shadow-2xl overflow-hidden relative flex items-center justify-center border-4 border-white">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-          <span className="text-indigo-200 font-mono text-sm z-10">Hero_NorthAmerica_Map.jpg</span>
+        <div className="w-full aspect-[21/9] rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white bg-indigo-900 relative">
+          <img src={heroNorthamericaMap} alt="North America Curriculum Map" className="w-full h-full object-cover absolute inset-0 mix-blend-screen opacity-80" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1E1B4B]/80 to-transparent"></div>
         </div>
       </section>
 
@@ -36,9 +39,8 @@ export default function CurriculumInfo() {
           <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col h-full">
             <h3 className="text-2xl font-bold text-slate-900 mb-3">Dynamic Dropdown</h3>
             <p className="text-slate-600 mb-8 flex-grow">A seamless UI that lets students quickly select their exact grade and state/province to load the right standards instantly.</p>
-            {/* IMAGE PLACEHOLDER */}
-            <div className="w-full aspect-video bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-center border-dashed">
-              <span className="text-slate-400 font-mono text-sm">UI_Dropdown_Selector.png</span>
+            <div className="w-full aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-inner">
+              <img src={uiDropdownSelector} alt="Curriculum Dropdown Selector" className="w-full h-full object-cover" />
             </div>
           </div>
 
@@ -46,9 +48,8 @@ export default function CurriculumInfo() {
           <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col h-full">
             <h3 className="text-2xl font-bold text-slate-900 mb-3">Chapter & Exercise View</h3>
             <p className="text-slate-600 mb-8 flex-grow">Structured learning paths. Students complete 10-exercise blocks to master specific concepts sequentially.</p>
-            {/* IMAGE PLACEHOLDER */}
-            <div className="w-full aspect-video bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-center border-dashed">
-              <span className="text-slate-400 font-mono text-sm">UI_Chapter_SplitView.png</span>
+            <div className="w-full aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-inner">
+              <img src={uiChapterSplitview} alt="Chapter Selection Interface" className="w-full h-full object-cover" />
             </div>
           </div>
 
@@ -56,20 +57,17 @@ export default function CurriculumInfo() {
           <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col h-full">
             <h3 className="text-2xl font-bold text-slate-900 mb-3">Difficulty Progression</h3>
             <p className="text-slate-600 mb-8 flex-grow">The AI automatically scales difficulty from Easy to Hard as the student demonstrates mastery, unlocking badges along the way.</p>
-            {/* IMAGE PLACEHOLDER */}
-            <div className="w-full aspect-video bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-center border-dashed">
-              <span className="text-slate-400 font-mono text-sm">Timeline_Difficulty.png</span>
+            <div className="w-full aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-inner">
+              <img src={timelineDifficulty} alt="Difficulty Progression Timeline" className="w-full h-full object-cover" />
             </div>
           </div>
 
           {/* Feature 4 */}
           <div className="bg-[#1E1B4B] p-8 rounded-3xl shadow-xl flex flex-col h-full relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-30"></div>
             <h3 className="text-2xl font-bold text-white mb-3 z-10">Full Coverage</h3>
             <p className="text-indigo-200 mb-8 flex-grow z-10">Whether it's the Ontario OSSD or Texas TEKS, our AI generates highly accurate localized content.</p>
-            {/* IMAGE PLACEHOLDER */}
-            <div className="w-full aspect-video bg-white/10 rounded-2xl border border-white/20 flex items-center justify-center border-dashed backdrop-blur-sm z-10">
-              <span className="text-indigo-300 font-mono text-sm">Diverse_Students_Map.jpg</span>
+            <div className="w-full aspect-video rounded-2xl overflow-hidden border border-white/20 shadow-lg z-10">
+              <img src={diverseStudentsMap} alt="Students across North America" className="w-full h-full object-cover" />
             </div>
           </div>
 

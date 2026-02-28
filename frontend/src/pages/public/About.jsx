@@ -2,6 +2,13 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
+// Image Imports
+import heroDesk from '../../assets/images/hero-desk.jpg';
+import step1Curriculum from '../../assets/images/step1-curriculum.png';
+import step2Practice from '../../assets/images/step2-practice.png';
+import step3Parents from '../../assets/images/step3-parents.png';
+import finalHighfive from '../../assets/images/final-highfive.jpg';
+
 export default function About() {
   const { t } = useTranslation();
   
@@ -15,16 +22,14 @@ export default function About() {
       {/* 1. Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
         <h1 className="text-4xl md:text-6xl font-extrabold text-[#1A1A1A] tracking-tight mb-6 max-w-4xl mx-auto">
-          {t('about.headline') || "We believe every child deserves an encouraging tutor"}
+          {t('about.headline')}
         </h1>
         <p className="text-xl text-slate-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-          {t('about.body') || "Founded by parents and educators who watched their own children struggle with generic AI tools. We built AI Tutor Pro to feel human — warm, patient, and perfectly matched to your local curriculum."}
+          {t('about.body')}
         </p>
         
-        {/* HERO IMAGE PLACEHOLDER (16:9, Ultra-realistic 13yo boy at modern desk) */}
-        <div className="relative max-w-5xl mx-auto aspect-video rounded-[2rem] shadow-2xl overflow-hidden border-8 border-white bg-slate-200 flex items-center justify-center group">
-          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-purple-500/10 mix-blend-overlay"></div>
-          <span className="text-slate-400 font-mono text-sm">Drop Hero_Desk_Shot.jpg here</span>
+        <div className="relative max-w-5xl mx-auto aspect-video rounded-[2rem] shadow-2xl overflow-hidden border-8 border-white bg-slate-200">
+          <img src={heroDesk} alt="Student learning with AI" className="w-full h-full object-cover" />
         </div>
       </section>
 
@@ -35,11 +40,8 @@ export default function About() {
         <div className="grid md:grid-cols-3 gap-12">
           {/* Step 1 */}
           <div className="flex flex-col items-center text-center">
-            <div className="w-full aspect-square bg-white rounded-3xl shadow-lg border border-slate-100 flex items-center justify-center mb-6 overflow-hidden p-4">
-               {/* IMAGE PLACEHOLDER: Clean flat 3D girl selecting curriculum */}
-               <div className="w-full h-full bg-indigo-50 rounded-2xl border border-indigo-100 flex items-center justify-center border-dashed">
-                 <span className="text-indigo-300 text-xs font-mono">Step1_Curriculum.png</span>
-               </div>
+            <div className="w-full aspect-square bg-white rounded-3xl shadow-lg border border-slate-100 mb-6 overflow-hidden">
+               <img src={step1Curriculum} alt="Choose Curriculum" className="w-full h-full object-cover" />
             </div>
             <div className="w-10 h-10 bg-[#4338CA] text-white rounded-full flex items-center justify-center font-bold text-lg mb-4 shadow-md">1</div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">Choose Curriculum</h3>
@@ -48,11 +50,8 @@ export default function About() {
 
           {/* Step 2 */}
           <div className="flex flex-col items-center text-center">
-            <div className="w-full aspect-square bg-white rounded-3xl shadow-lg border border-slate-100 flex items-center justify-center mb-6 overflow-hidden p-4">
-               {/* IMAGE PLACEHOLDER: Split-screen Practice Session */}
-               <div className="w-full h-full bg-purple-50 rounded-2xl border border-purple-100 flex items-center justify-center border-dashed">
-                 <span className="text-purple-300 text-xs font-mono">Step2_Practice.png</span>
-               </div>
+            <div className="w-full aspect-square bg-white rounded-3xl shadow-lg border border-slate-100 mb-6 overflow-hidden">
+               <img src={step2Practice} alt="Practice Session" className="w-full h-full object-cover" />
             </div>
             <div className="w-10 h-10 bg-[#4338CA] text-white rounded-full flex items-center justify-center font-bold text-lg mb-4 shadow-md">2</div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">Practice Session</h3>
@@ -61,11 +60,8 @@ export default function About() {
 
           {/* Step 3 */}
           <div className="flex flex-col items-center text-center">
-            <div className="w-full aspect-square bg-white rounded-3xl shadow-lg border border-slate-100 flex items-center justify-center mb-6 overflow-hidden p-4">
-               {/* IMAGE PLACEHOLDER: Mother and father looking at progress */}
-               <div className="w-full h-full bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center justify-center border-dashed">
-                 <span className="text-emerald-300 text-xs font-mono">Step3_Parents.png</span>
-               </div>
+            <div className="w-full aspect-square bg-white rounded-3xl shadow-lg border border-slate-100 mb-6 overflow-hidden">
+               <img src={step3Parents} alt="Weekly Progress" className="w-full h-full object-cover" />
             </div>
             <div className="w-10 h-10 bg-[#4338CA] text-white rounded-full flex items-center justify-center font-bold text-lg mb-4 shadow-md">3</div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">Weekly Progress</h3>
@@ -77,7 +73,7 @@ export default function About() {
       {/* 3. Final Result CTA Section */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="bg-[#1E1B4B] rounded-[2.5rem] p-8 md:p-12 shadow-2xl flex flex-col md:flex-row items-center gap-10 overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
           
           <div className="flex-1 z-10 text-center md:text-left">
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 leading-tight">
@@ -92,14 +88,12 @@ export default function About() {
           </div>
           
           <div className="flex-1 w-full z-10">
-            {/* FINAL IMAGE PLACEHOLDER: Confident girl high-fiving AI */}
-            <div className="aspect-video bg-white/10 rounded-2xl border border-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden">
-               <span className="text-indigo-200 font-mono text-sm">Final_HighFive.jpg</span>
+            <div className="aspect-video rounded-2xl overflow-hidden shadow-lg border border-white/20">
+               <img src={finalHighfive} alt="Student success" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
       </section>
-
     </div>
   );
 }
