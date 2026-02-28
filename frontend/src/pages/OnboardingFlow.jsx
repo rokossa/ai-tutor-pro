@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 export default function OnboardingFlow() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [isSending, setIsSending] = useState(false);
   const [childData, setChildData] = useState({
-    name: 'Alexandre', // Defaulting to your son for the demo!
+    name: 'Alexandre',
     email: '',
     country: 'Canada',
     region: 'Ontario',
@@ -14,8 +15,36 @@ export default function OnboardingFlow() {
 
   const handleNext = () => setStep(step + 1);
   
-  const finishOnboarding = () => {
-    navigate('/dashboard/parent');
+  const finishOnboarding = async () => {
+    setIsSending(true);
+    try {
+      // In production, Vite uses the env variable. Fallback to localhost for dev.
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+      
+      const response = await fetch(`${apiUrl}/family/send-invite`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          childEmail: childData.email || 'alexandre.test@example.com',
+          childName: childData.name,
+          parentName: 'David', // In a real app, pull this from user context
+          parentEmail: 'david.test@example.com',
+          grade: childData.grade,
+          region: childData.region
+        })
+      });
+
+      // Simulate a slight network delay so the user sees the loading state
+      setTimeout(() => {
+        setIsSending(false);
+        navigate('/dashboard/parent');
+      }, 800);
+
+    } catch (error) {
+      console.error("Failed to trigger email service:", error);
+      setIsSending(false);
+      navigate('/dashboard/parent'); // Failsafe: still push them to dashboard
+    }
   };
 
   return (
@@ -31,7 +60,7 @@ export default function OnboardingFlow() {
 
       <div className="w-full max-w-2xl bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 relative">
         
-        {/* Progress Bar (Visible on Steps 1 & 2) */}
+        {/* Progress Bar */}
         {step <= 2 && (
           <div className="px-10 pt-10">
             <div className="flex justify-between text-sm font-bold text-slate-800 mb-2">
@@ -45,16 +74,14 @@ export default function OnboardingFlow() {
 
         <div className="p-10">
           
-          {/* STEP 1: Welcome & Trial Setup */}
+          {/* STEP 1: Welcome */}
           {step === 1 && (
             <div className="text-center animate-in fade-in slide-in-from-bottom-4">
               <h2 className="text-4xl font-extrabold text-slate-900 mb-4">Welcome to AI Tutor Pro, David! ✨</h2>
               <p className="text-slate-500 text-lg mb-8">In 60 seconds we'll set up your child's personal AI tutor that actually cares</p>
-              
               <div className="w-48 h-48 mx-auto bg-indigo-50 rounded-full flex items-center justify-center mb-8 border-8 border-white shadow-inner">
                 <span className="text-7xl">🤖</span>
               </div>
-
               <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
                 <p className="text-slate-700 font-medium mb-6">Your child deserves an encouraging tutor who knows their exact local curriculum.</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -73,7 +100,6 @@ export default function OnboardingFlow() {
           {step === 2 && (
             <div className="animate-in fade-in slide-in-from-right-8">
               <h2 className="text-3xl font-extrabold text-slate-900 mb-8">Let's create your child's AI Tutor account 🤩</h2>
-              
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2">Child's Name</label>
@@ -81,9 +107,8 @@ export default function OnboardingFlow() {
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2">Child's Email (Optional)</label>
-                  <input type="email" placeholder="child@email.com" className="w-full border border-slate-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-indigo-500" />
+                  <input type="email" value={childData.email} onChange={e => setChildData({...childData, email: e.target.value})} placeholder="child@email.com" className="w-full border border-slate-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-indigo-500" />
                 </div>
-                
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2">Country</label>
                   <div className="flex gap-6">
@@ -97,7 +122,6 @@ export default function OnboardingFlow() {
                     </label>
                   </div>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-bold text-slate-700 mb-2">State/Province</label>
@@ -112,7 +136,6 @@ export default function OnboardingFlow() {
                     </select>
                   </div>
                 </div>
-
                 <button onClick={handleNext} className="w-full bg-[#4338CA] text-white font-bold py-4 mt-4 rounded-xl hover:bg-indigo-800 transition shadow-lg">
                   Add Child & Continue
                 </button>
@@ -124,15 +147,11 @@ export default function OnboardingFlow() {
           {step === 3 && (
             <div className="text-center animate-in zoom-in duration-300 py-8">
               <h2 className="text-4xl font-extrabold text-slate-900 mb-8">{childData.name} is now ready for his AI Tutor! 🤩</h2>
-              
               <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 border-4 border-white shadow-lg">
                 <span className="text-green-500 text-5xl font-black">✓</span>
               </div>
-
               <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm max-w-sm mx-auto mb-8 relative">
-                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-xl border-4 border-white">
-                  👦🏽
-                </div>
+                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-xl border-4 border-white">👦🏽</div>
                 <h3 className="font-bold text-xl text-slate-900 mt-4">{childData.name}</h3>
                 <p className="text-slate-500 text-sm">{childData.grade} • {childData.region}</p>
                 <div className="mt-6">
@@ -141,18 +160,16 @@ export default function OnboardingFlow() {
                   </button>
                 </div>
               </div>
-              <button onClick={() => setStep(2)} className="text-slate-500 font-bold hover:text-slate-800 transition">
-                Add another child
-              </button>
+              <button onClick={() => setStep(2)} className="text-slate-500 font-bold hover:text-slate-800 transition">Add another child</button>
             </div>
           )}
 
-          {/* STEP 4: Invite Link / Magic Link */}
+          {/* STEP 4: Invite Link */}
           {step === 4 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 py-4 text-center">
               <h2 className="text-3xl font-extrabold text-slate-900 mb-2">Invite AI Tutor</h2>
               <p className="text-slate-500 mb-8">Invite {childData.name} to meet his personal AI Tutor</p>
-
+              
               <div className="bg-slate-50 p-2 rounded-xl flex mb-6 border border-slate-200 max-w-md mx-auto">
                 <button className="flex-1 bg-white text-indigo-700 font-bold py-2 rounded-lg shadow-sm flex items-center justify-center gap-2 border border-slate-200">
                   <span className="w-5 h-5 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs">✓</span> Send invitation email
@@ -168,8 +185,14 @@ export default function OnboardingFlow() {
                   Click here to start practicing math with your encouraging AI tutor 🤩<br/>
                   <span className="text-blue-600">[magic link]</span>
                 </div>
-                <button onClick={finishOnboarding} className="w-full bg-[#4338CA] text-white font-bold py-3 rounded-xl shadow-md hover:bg-indigo-800 transition">
-                  Send Invitation Now
+                <button 
+                  onClick={finishOnboarding} 
+                  disabled={isSending}
+                  className="w-full bg-[#4338CA] text-white font-bold py-3 rounded-xl shadow-md hover:bg-indigo-800 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isSending ? (
+                    <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Sending...</>
+                  ) : "Send Invitation Now"}
                 </button>
               </div>
             </div>
