@@ -22,16 +22,10 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/onboarding" element={<OnboardingFlow />} />
-          
-          {/* Practice Area (Student Only) */}
           <Route path="/practice" element={<PracticeArena />} />
-          
           <Route path="/curriculum/:regionId" element={<CurriculumPage />} />
-          
-          {/* Distinct Dashboards */}
           <Route path="/dashboard/parent" element={<ParentDashboard />} />
           <Route path="/dashboard/student" element={<StudentDashboard />} />
-          
           <Route path="/dashboard/settings" element={<AccountSettings />} />
           <Route path="/student-join" element={<StudentSignup />} />
           <Route path="/signup/parent" element={<ParentSignup />} />

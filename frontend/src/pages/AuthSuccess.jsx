@@ -8,13 +8,8 @@ export default function AuthSuccess() {
 
   useEffect(() => {
     if (token) {
-      // Save the secure token to local storage
       localStorage.setItem('ai_tutor_token', token);
-      
-      // Redirect to the Parent Dashboard
-      setTimeout(() => {
-        navigate('/dashboard/parent');
-      }, 1000);
+      setTimeout(() => navigate('/dashboard/parent'), 1000);
     } else {
       navigate('/signup/parent');
     }
