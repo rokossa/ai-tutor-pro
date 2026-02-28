@@ -8,6 +8,7 @@ const PracticeArena = React.lazy(() => import('./pages/PracticeArena'));
 const CurriculumPage = React.lazy(() => import('./pages/CurriculumPage'));
 const ParentDashboard = React.lazy(() => import('./pages/dashboard/ParentDashboard'));
 const StudentDashboard = React.lazy(() => import('./pages/dashboard/StudentDashboard'));
+const TutorDashboard = React.lazy(() => import('./pages/dashboard/TutorDashboard'));
 const CourseView = React.lazy(() => import('./pages/CourseView'));
 const AccountSettings = React.lazy(() => import('./pages/dashboard/AccountSettings'));
 const StudentSignup = React.lazy(() => import('./pages/StudentSignup'));
@@ -25,8 +26,12 @@ function App() {
           <Route path="/onboarding" element={<OnboardingFlow />} />
           <Route path="/practice" element={<PracticeArena />} />
           <Route path="/curriculum/:regionId" element={<CurriculumPage />} />
+          
+          {/* Persona Dashboards */}
           <Route path="/dashboard/parent" element={<ParentDashboard />} />
           <Route path="/dashboard/student" element={<StudentDashboard />} />
+          <Route path="/dashboard/tutor" element={<TutorDashboard />} />
+          
           <Route path="/course/:courseId" element={<CourseView />} />
           <Route path="/dashboard/settings" element={<AccountSettings />} />
           <Route path="/student-join" element={<StudentSignup />} />
