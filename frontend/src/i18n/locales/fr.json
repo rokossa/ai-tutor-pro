@@ -1,30 +1,54 @@
 {
   "translation": {
-    "common": {
-      "startFreeTrial": "Commencer l'essai gratuit de 14 jours",
-      "watchDemo": "Regarder la démo de 47 secondes",
-      "login": "Se connecter",
-      "register": "Créer un compte",
-      "continue": "Continuer",
-      "submit": "Soumettre",
-      "cancel": "Annuler",
-      "save": "Enregistrer",
-      "downloadPDF": "Télécharger le rapport PDF",
-      "backToDashboard": "Retour au tableau de bord",
-      "next": "Suivant",
-      "previous": "Précédent",
-      "loading": "Chargement...",
-      "error": "Une erreur s'est produite. Veuillez réessayer."
-    },
-    "home": {
-      "title": "AI Tutor Pro — Le tuteur IA personnel de votre enfant",
-      "hero": {
-        "headline": "Le tuteur IA personnel de votre enfant qui se soucie vraiment ❤️",
-        "subheadline": "Questions d'entraînement instantanées basées sur son programme scolaire exact (États-Unis et Canada). Retours chaleureux étape par étape. Streaks quotidiens. Rapports hebdomadaires aux parents.",
-        "cta": "Commencer l'essai gratuit de 14 jours"
-      },
+    "marketing": {
+      "seoTitle": "AI Tutor Pro — Le tuteur IA personnel de votre enfant (6e à 12e année)",
+      "heroHeadline": "Le tuteur IA personnel de votre enfant qui se soucie vraiment ❤️",
+      "heroSub": "Des questions instantanées tirées de leur programme scolaire exact. Des retours encourageants. Des séries et des badges quotidiens. Des courriels de progrès hebdomadaires pour vous.",
       "trusted": "Fait confiance par plus de 4 872 familles aux États-Unis et au Canada",
-      "testimonial": "« Enfin un tuteur IA qui parle comme un vrai professeur — gentil et patient. » — Sarah T., Ontario"
+      "testimonial": "« Enfin, un tuteur IA qui ressemble à un vrai professeur — gentil et patient. » — Sarah T., Ontario",
+      "curriculum": "Fonctionne avec chaque programme : 50 États américains + 13 provinces/territoires canadiens",
+      "startTrial": "Commencer l'essai gratuit de 14 jours",
+      "watchDemo": "Regarder la démo de 47 secondes"
+    },
+    "about": {
+      "seoTitle": "À propos d'AI Tutor Pro — Conçu pour les vrais élèves et parents",
+      "headline": "Nous croyons que chaque enfant mérite un tuteur encourageant",
+      "body": "Fondé par des parents et des éducateurs qui ont vu leur propre enfant de 13 ans lutter avec des outils d'IA génériques. Nous avons conçu AI Tutor Pro pour qu'il soit humain — chaleureux, patient et parfaitement adapté au programme scolaire local de votre enfant."
+    },
+    "mission": {
+      "headline": "Aider chaque élève de la 6e à la 12e année à croire en lui-même",
+      "core": "Nous ne nous contentons pas de générer des questions. Nous célébrons l'effort, expliquons étape par étape et ne faisons jamais sentir à un enfant qu'il a « tort »."
+    },
+    "pricing": {
+      "seoTitle": "Tarification simple — 14,99 $/mois • Annulez en tout temps",
+      "headline": "Un seul forfait. Pratique illimitée. De vrais résultats.",
+      "planName": "AI Tutor Pro Mensuel",
+      "price": "14,99 $ USD / mois",
+      "features": [
+        "Questions et corrections illimitées",
+        "Rapports hebdomadaires aux parents",
+        "Couverture complète du programme (É.-U. + Canada)",
+        "Essai gratuit de 14 jours • Annulez en tout temps"
+      ],
+      "cta": "Commencer l'essai gratuit →"
+    },
+    "contact": {
+      "headline": "Nous aimerions avoir de vos nouvelles",
+      "formName": "Nom",
+      "formEmail": "Courriel",
+      "formRole": "Je suis un(e)...",
+      "roleParent": "Parent",
+      "roleStudent": "Élève",
+      "roleTutor": "Tuteur/Enseignant",
+      "formMessage": "Message",
+      "submit": "Envoyer le message",
+      "success": "Merci ! Nous vous répondrons dans les 24 heures."
+    },
+    "errors": {
+      "404Headline": "Oups ! Page introuvable",
+      "404Body": "On dirait que cette page s'est égarée pour faire des exercices supplémentaires. Ramenons-vous à la maison.",
+      "paywallHeadline": "Presque terminé !",
+      "paywallBody": "Vous avez besoin d'un abonnement actif pour continuer à pratiquer. Débloquez le tutorat IA illimité pour seulement 14,99 $/mois."
     }
   }
 }

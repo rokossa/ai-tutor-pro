@@ -1,30 +1,54 @@
 {
   "translation": {
-    "common": {
-      "startFreeTrial": "Start 14-Day Free Trial",
-      "watchDemo": "Watch 47-second Demo",
-      "login": "Log In",
-      "register": "Create Account",
-      "continue": "Continue",
-      "submit": "Submit",
-      "cancel": "Cancel",
-      "save": "Save",
-      "downloadPDF": "Download PDF Report",
-      "backToDashboard": "Back to Dashboard",
-      "next": "Next",
-      "previous": "Previous",
-      "loading": "Loading...",
-      "error": "Something went wrong. Please try again."
-    },
-    "home": {
-      "title": "AI Tutor Pro — Your Child’s Personal AI Tutor",
-      "hero": {
-        "headline": "Your child’s personal AI tutor that actually cares ❤️",
-        "subheadline": "Instant practice questions from their exact local curriculum (US & Canada). Warm, step-by-step feedback. Daily streaks. Weekly parent reports.",
-        "cta": "Start 14-Day Free Trial"
-      },
+    "marketing": {
+      "seoTitle": "AI Tutor Pro — Your Child’s Personal AI Tutor (Grades 6–12)",
+      "heroHeadline": "Your child’s personal AI tutor that actually cares ❤️",
+      "heroSub": "Instant questions from their exact school curriculum. Encouraging feedback. Daily streaks & badges. Weekly progress emails to you.",
       "trusted": "Trusted by 4,872+ families across the US & Canada",
-      "testimonial": "“Finally, an AI tutor that sounds like a real teacher — kind and patient.” — Sarah T., Ontario"
+      "testimonial": "“Finally, an AI tutor that sounds like a real teacher — kind and patient.” — Sarah T., Ontario",
+      "curriculum": "Works with every curriculum: 50 US States + 13 Canadian Provinces/Territories",
+      "startTrial": "Start 14-Day Free Trial",
+      "watchDemo": "Watch 47-second demo"
+    },
+    "about": {
+      "seoTitle": "About AI Tutor Pro — Built for Real Students & Parents",
+      "headline": "We believe every child deserves an encouraging tutor",
+      "body": "Founded by parents and educators who watched their own 13-year-old struggle with generic AI tools. We built AI Tutor Pro to feel human — warm, patient, and perfectly matched to your child’s local curriculum."
+    },
+    "mission": {
+      "headline": "Helping every Grade 6–12 student believe in themselves",
+      "core": "We don’t just generate questions. We celebrate effort, explain step-by-step, and never make a child feel “wrong.”"
+    },
+    "pricing": {
+      "seoTitle": "Simple Pricing — $14.99/month • Cancel Anytime",
+      "headline": "One plan. Unlimited practice. Real results.",
+      "planName": "AI Tutor Pro Monthly",
+      "price": "$14.99 USD / month",
+      "features": [
+        "Unlimited questions & grading",
+        "Weekly parent reports",
+        "Full curriculum coverage (US + Canada)",
+        "14-day free trial • Cancel anytime"
+      ],
+      "cta": "Start Free Trial →"
+    },
+    "contact": {
+      "headline": "We’d love to hear from you",
+      "formName": "Name",
+      "formEmail": "Email",
+      "formRole": "I’m a...",
+      "roleParent": "Parent",
+      "roleStudent": "Student",
+      "roleTutor": "Tutor",
+      "formMessage": "Message",
+      "submit": "Send Message",
+      "success": "Thank you! We’ll reply within 24 hours."
+    },
+    "errors": {
+      "404Headline": "Oops! Page not found",
+      "404Body": "Looks like this page wandered off to do some extra practice questions. Let’s get you back home.",
+      "paywallHeadline": "Almost there!",
+      "paywallBody": "You need an active subscription to continue practicing. Unlock unlimited AI tutoring for just $14.99/month."
     }
   }
 }
