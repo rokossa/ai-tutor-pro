@@ -6,6 +6,32 @@ import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 export default function TutorDashboard() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showPromptBuilder, setShowPromptBuilder] = useState(false);
+  const [customPrompt, setCustomPrompt] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedExercises, setGeneratedExercises] = useState([]);
+  
+  const handleGenerate = async () => {
+    if (!customPrompt) return;
+    setIsGenerating(true);
+    try {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+      const response = await fetch(`${apiUrl}/ai/generate-exercise`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: customPrompt,
+          studentName: selectedStudent?.name,
+          grade: selectedStudent?.grade
+        })
+      });
+      const data = await response.json();
+      if (data.success) setGeneratedExercises(data.exercises);
+    } catch (error) {
+      console.error("Failed to generate:", error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   // Mock Data mapped to your family
   const students = [
@@ -189,18 +215,31 @@ export default function TutorDashboard() {
                 <div className="flex items-center gap-2 text-white font-bold">
                   <Sparkles size={18} className="text-purple-400" /> Gemini Prompt Builder
                 </div>
-                <button onClick={() => setShowPromptBuilder(false)} className="text-slate-400 hover:text-white transition">✕</button>
+                <button onClick={() => { setShowPromptBuilder(false); setGeneratedExercises([]); setCustomPrompt(""); }} className="text-slate-400 hover:text-white transition">✕</button>
               </div>
               <div className="p-6">
                 <p className="text-slate-300 text-sm mb-4">Command the AI to generate a highly targeted exercise block for <strong className="text-white">{selectedStudent?.name}</strong>.</p>
-                <textarea 
-                  defaultValue={`Create 5 medium-level algebra word problems for ${selectedStudent?.name} involving basketball scoring.`}
-                  className="w-full h-32 bg-[#1e1e1e] border border-[#3f3f3f] rounded-xl p-4 text-white font-mono text-sm outline-none focus:border-purple-500 resize-none mb-6"
-                ></textarea>
+                {generatedExercises.length > 0 ? (
+                  <div className="space-y-4 mb-6 max-h-64 overflow-y-auto pr-2">
+                    {generatedExercises.map((ex, idx) => (
+                      <div key={idx} className="bg-[#1e1e1e] p-4 rounded-xl border border-[#3f3f3f]">
+                        <p className="text-white text-sm mb-2 font-medium">Q: {ex.question}</p>
+                        <p className="text-emerald-400 text-xs font-mono">A: {ex.answer}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <textarea 
+                    value={customPrompt} 
+                    onChange={(e) => setCustomPrompt(e.target.value)}
+                    placeholder={`Create 3 algebra word problems for ${selectedStudent?.name}...`}
+                    className="w-full h-32 bg-[#1e1e1e] border border-[#3f3f3f] rounded-xl p-4 text-white font-mono text-sm outline-none focus:border-purple-500 resize-none mb-6"
+                  ></textarea>
+                )}
                 <div className="flex justify-end gap-3">
-                  <button onClick={() => setShowPromptBuilder(false)} className="px-5 py-2.5 rounded-xl font-bold text-slate-300 hover:bg-[#3f3f3f] transition">Cancel</button>
-                  <button className="bg-indigo-500 hover:bg-indigo-400 text-white font-bold px-6 py-2.5 rounded-xl transition shadow-lg flex items-center gap-2">
-                    <Sparkles size={16} /> Generate Now
+                  <button onClick={() => { setShowPromptBuilder(false); setGeneratedExercises([]); setCustomPrompt(""); }} className="px-5 py-2.5 rounded-xl font-bold text-slate-300 hover:bg-[#3f3f3f] transition">Cancel</button>
+                  <button onClick={handleGenerate} disabled={isGenerating || (!customPrompt && generatedExercises.length === 0)} className="bg-indigo-500 hover:bg-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-6 py-2.5 rounded-xl transition shadow-lg flex items-center gap-2">
+                    <Sparkles size={16} /> {isGenerating ? "Thinking..." : generatedExercises.length > 0 ? "Assign to Student" : "Generate Now"}
                   </button>
                 </div>
               </div>

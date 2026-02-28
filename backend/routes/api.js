@@ -5,5 +5,6 @@ router.get('/health', (req, res) => res.status(200).json({ status: 'ok', message
 
 router.use('/auth', require('./auth'));
 router.use('/family', require('./family'));
+router.use('/ai', require('./ai')); // <-- Newly added AI route
 
 module.exports = router;
