@@ -7,6 +7,8 @@ import PublicLayout from './components/layout/PublicLayout';
 // 1. Public Pages
 const LandingPage = React.lazy(() => import('./pages/LandingPage'));
 const About = React.lazy(() => import('./pages/public/About'));
+const CurriculumInfo = React.lazy(() => import('./pages/public/CurriculumInfo'));
+const ParentInfo = React.lazy(() => import('./pages/public/ParentInfo'));
 const Mission = React.lazy(() => import('./pages/public/Mission'));
 const Pricing = React.lazy(() => import('./pages/public/Pricing'));
 const Contact = React.lazy(() => import('./pages/public/Contact'));
@@ -51,6 +53,8 @@ function App() {
           <Route element={<PublicLayout />}>
             <Route path="/" element={<LandingPage />} />
             <Route path="/about" element={<About />} />
+            <Route path="/curriculum" element={<CurriculumInfo />} />
+            <Route path="/parent-info" element={<ParentInfo />} />
             <Route path="/mission" element={<Mission />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/contact" element={<Contact />} />
