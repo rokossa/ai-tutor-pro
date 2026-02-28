@@ -7,11 +7,13 @@ const OnboardingFlow = React.lazy(() => import('./pages/OnboardingFlow'));
 const PracticeArena = React.lazy(() => import('./pages/PracticeArena'));
 const CurriculumPage = React.lazy(() => import('./pages/CurriculumPage'));
 const ParentDashboard = React.lazy(() => import('./pages/dashboard/ParentDashboard'));
+const StudentDashboard = React.lazy(() => import('./pages/dashboard/StudentDashboard'));
 const AccountSettings = React.lazy(() => import('./pages/dashboard/AccountSettings'));
 const StudentSignup = React.lazy(() => import('./pages/StudentSignup'));
 const ParentSignup = React.lazy(() => import('./pages/ParentSignup'));
 const VerifyEmail = React.lazy(() => import('./pages/VerifyEmail'));
 const TutorSignup = React.lazy(() => import('./pages/TutorSignup'));
+const AuthSuccess = React.lazy(() => import('./pages/AuthSuccess'));
 
 function App() {
   return (
@@ -20,14 +22,22 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/onboarding" element={<OnboardingFlow />} />
+          
+          {/* Practice Area (Student Only) */}
           <Route path="/practice" element={<PracticeArena />} />
+          
           <Route path="/curriculum/:regionId" element={<CurriculumPage />} />
+          
+          {/* Distinct Dashboards */}
           <Route path="/dashboard/parent" element={<ParentDashboard />} />
+          <Route path="/dashboard/student" element={<StudentDashboard />} />
+          
           <Route path="/dashboard/settings" element={<AccountSettings />} />
           <Route path="/student-join" element={<StudentSignup />} />
           <Route path="/signup/parent" element={<ParentSignup />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/tutor-join" element={<TutorSignup />} />
+          <Route path="/auth-success" element={<AuthSuccess />} />
         </Routes>
       </Suspense>
     </Router>
