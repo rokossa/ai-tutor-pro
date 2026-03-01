@@ -11,7 +11,6 @@ const CurriculumInfo = React.lazy(() => import('./pages/public/CurriculumInfo'))
 const Pricing = React.lazy(() => import('./pages/public/Pricing'));
 const ParentInfo = React.lazy(() => import('./pages/public/ParentInfo'));
 const Mission = React.lazy(() => import('./pages/public/Mission'));
-const Pricing = React.lazy(() => import('./pages/public/Pricing'));
 const Contact = React.lazy(() => import('./pages/public/Contact'));
 const FAQ = React.lazy(() => import('./pages/public/FAQ'));
 const Privacy = React.lazy(() => import('./pages/public/Privacy'));
@@ -59,7 +58,6 @@ function App() {
           <Route path="/pricing" element={<Pricing />} />
             <Route path="/parent-info" element={<ParentInfo />} />
             <Route path="/mission" element={<Mission />} />
-            <Route path="/pricing" element={<Pricing />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/privacy" element={<Privacy />} />
