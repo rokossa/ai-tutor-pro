@@ -1,162 +1,181 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { ChevronLeft, Send, Lightbulb, Sparkles, Flame } from 'lucide-react';
 
 export default function PracticeArena() {
-  const [exerciseNum, setExerciseNum] = useState(1);
-  const [answer, setAnswer] = useState('');
-  const [status, setStatus] = useState('answering'); // answering, graded, block_complete
+  const { course, chapter } = useParams();
   
+  // Interactive State
+  const [answer, setAnswer] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(null);
+  const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 10;
+
+  // Mock Question Data (In a real app, this comes from your backend)
+  const currentQuestion = {
+    text: "Solve for x:  3x + 5 = 20",
+    hint: "Think about what you need to do to get 3x by itself first. What happens if you subtract 5 from both sides?",
+    correctAnswer: "5"
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    setStatus('graded');
+    if (!answer) return;
+    
+    // Simple mock grading logic
+    const correct = answer.trim() === currentQuestion.correctAnswer;
+    setIsCorrect(correct);
+    setIsSubmitted(true);
   };
 
   const handleNext = () => {
-    if (exerciseNum < 10) {
-      setExerciseNum(prev => prev + 1);
-      setAnswer('');
-      setStatus('answering');
-    } else {
-      setStatus('block_complete');
+    setAnswer('');
+    setIsSubmitted(false);
+    setIsCorrect(null);
+    if (currentStep < totalSteps) {
+      setCurrentStep(prev => prev + 1);
     }
   };
 
-  if (status === 'block_complete') {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden font-sans">
-        {/* Confetti effect placeholder */}
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30"></div>
-        
-        <div className="bg-white/95 backdrop-blur-md p-10 rounded-[2rem] shadow-2xl max-w-lg w-full text-center z-10 border border-amber-200">
-          <h2 className="text-3xl font-extrabold text-amber-700 mb-6">Chapter Block Complete! ✨</h2>
-          
-          <div className="flex justify-center gap-6 mb-8">
-            <div className="text-center">
-              <p className="text-slate-500 font-bold uppercase tracking-wider text-xs mb-1">Average</p>
-              <p className="text-5xl font-black text-slate-900">91%</p>
-            </div>
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3">
-              <span className="text-3xl">⭐</span>
-              <div className="text-left">
-                <p className="font-bold text-slate-900">Linear Equations</p>
-                <p className="text-amber-700 text-sm font-medium">Novice</p>
-              </div>
-            </div>
-          </div>
-
-          <p className="text-slate-700 font-medium mb-8 leading-relaxed">
-            You just completed 10 exercises - difficulty will now increase to <strong>Medium</strong> for the next block!
-          </p>
-
-          <div className="space-y-3">
-            <button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-4 rounded-xl shadow-lg hover:opacity-90 transition">
-              Start Next 10 Exercises (Medium)
-            </button>
-            <Link to="/course/math" className="block w-full bg-slate-100 text-slate-700 font-bold py-4 rounded-xl hover:bg-slate-200 transition border border-slate-200">
-              Choose Another Chapter
-            </Link>
+  return (
+    <div className="min-h-screen flex flex-col bg-[#F4F4F5] font-sans">
+      
+      {/* Top Header / Progress Bar */}
+      <header className="bg-white border-b border-slate-200 h-16 flex items-center px-4 sm:px-8 justify-between shrink-0">
+        <div className="flex items-center gap-4">
+          <Link to="/student/dashboard" className="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-600 transition">
+            <ChevronLeft size={20} />
+          </Link>
+          <div>
+            <h1 className="text-lg font-bold text-slate-900 capitalize">{course || 'Math'} • {chapter?.replace('-', ' ') || 'Linear Equations'}</h1>
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Exercise {currentStep} of {totalSteps}</div>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-[#F4F4F5] flex items-center justify-center p-4 font-sans selection:bg-indigo-200">
-      <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100 flex flex-col md:flex-row min-h-[550px]">
         
-        {/* Left Panel: The Question */}
-        <div className="flex-1 p-8 md:p-10 border-b md:border-b-0 md:border-r border-slate-100 flex flex-col">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="font-bold text-slate-800 text-lg">Exercise {exerciseNum}/10 • Linear Equations</h2>
+        <div className="flex items-center gap-6">
+          <div className="hidden sm:flex items-center gap-2">
+            <div className="w-48 h-3 bg-slate-100 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-[#4338CA] to-purple-500 transition-all duration-500"
+                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+              ></div>
+            </div>
           </div>
+          <div className="flex items-center gap-2 bg-orange-100 text-orange-600 px-3 py-1.5 rounded-xl font-bold text-sm">
+            <Flame size={16} className="fill-current" /> 4 Days
+          </div>
+        </div>
+      </header>
 
-          <div className="flex-1">
-            <p className="text-slate-900 text-xl font-medium mb-4">
-              Solve for x: <span className="font-mono text-indigo-600 bg-indigo-50 px-2 rounded">3x + 12 = 27</span>. Show every step.
-            </p>
-            <p className="text-slate-500 text-lg italic mb-8">
-              Résous pour x: 3x + 12 = 27. Montre tous les pas.
-            </p>
-            
-            {status === 'answering' ? (
-              <textarea 
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                autoFocus
-                className="w-full h-40 p-5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 resize-none text-lg text-slate-800 font-mono shadow-inner"
-              ></textarea>
-            ) : (
-              <div className="w-full p-5 bg-slate-50 border border-slate-200 rounded-2xl text-lg text-slate-800 font-mono">
-                {answer || "x = 5"}
-              </div>
+      {/* Split Screen Workspace */}
+      <main className="flex-grow flex flex-col lg:flex-row overflow-hidden">
+        
+        {/* LEFT: The Question Workspace */}
+        <div className="flex-1 p-6 sm:p-12 overflow-y-auto flex flex-col justify-center">
+          <div className="max-w-2xl mx-auto w-full">
+            <div className="bg-white rounded-[2rem] p-10 shadow-sm border border-slate-200 mb-8">
+              <h2 className="text-2xl font-medium text-slate-700 mb-8 leading-relaxed">
+                {currentQuestion.text}
+              </h2>
+              
+              <form onSubmit={handleSubmit} className="relative">
+                <input 
+                  type="text" 
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  disabled={isSubmitted && isCorrect}
+                  placeholder="Type your answer here..."
+                  className={`w-full text-2xl p-6 rounded-2xl outline-none border-2 transition-all ${
+                    isSubmitted 
+                      ? isCorrect 
+                        ? 'border-emerald-400 bg-emerald-50 text-emerald-800' 
+                        : 'border-amber-400 bg-amber-50 text-amber-800'
+                      : 'border-slate-200 bg-slate-50 focus:border-[#4338CA] focus:bg-white'
+                  }`}
+                />
+                
+                {!isSubmitted && (
+                  <button type="submit" className="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-[#4338CA] text-white rounded-xl flex items-center justify-center hover:bg-indigo-800 transition shadow-md">
+                    <Send size={20} />
+                  </button>
+                )}
+              </form>
+            </div>
+
+            {/* Hint Button */}
+            {!isSubmitted && (
+              <button className="flex items-center gap-2 text-[#4338CA] font-bold hover:bg-indigo-50 px-4 py-2 rounded-xl transition mx-auto">
+                <Lightbulb size={20} /> Need a hint?
+              </button>
             )}
           </div>
         </div>
 
-        {/* Right Panel: AI Companion & Feedback */}
-        <div className="flex-1 p-8 md:p-10 bg-[#F8FAFC] flex flex-col relative">
-          <div className="flex justify-between items-center w-full mb-8">
-            <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden ml-4">
-              <div className="bg-[#4338CA] h-full transition-all duration-300" style={{ width: `${(exerciseNum/10)*100}%` }}></div>
+        {/* RIGHT: The AI Tutor Companion */}
+        <div className="lg:w-[450px] bg-white border-l border-slate-200 p-8 flex flex-col relative z-10 shadow-2xl lg:shadow-none">
+          <div className="flex items-center gap-3 mb-8 pb-6 border-b border-slate-100">
+            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+              <Sparkles size={24} />
             </div>
-            <span className="ml-4 font-bold text-slate-700 whitespace-nowrap">🔥 {exerciseNum}/10</span>
+            <div>
+              <h3 className="font-bold text-slate-900 text-lg">AI Tutor</h3>
+              <p className="text-xs text-emerald-500 font-bold uppercase tracking-wider flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online
+              </p>
+            </div>
           </div>
 
-          {status === 'answering' ? (
-            <div className="flex-1 flex flex-col items-center justify-center animate-in fade-in">
-              <div className="bg-white px-6 py-3 rounded-2xl rounded-br-sm shadow-sm border border-slate-200 mb-6 relative">
-                <p className="font-medium text-slate-700">Take your time, I'm here to help!</p>
-              </div>
-              {/* Cute Robot SVG */}
-              <div className="w-40 h-40 bg-white rounded-full shadow-lg border border-slate-100 flex items-center justify-center text-7xl mb-8 relative">
-                 🤖
-                 <div className="absolute top-2 right-4 w-4 h-4 bg-emerald-400 rounded-full animate-pulse"></div>
-              </div>
-              <button 
-                onClick={handleSubmit}
-                disabled={!answer}
-                className="w-full bg-gradient-to-r from-[#5B45A8] to-[#7C3AED] text-white font-bold py-4 rounded-xl hover:opacity-90 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-lg"
-              >
-                Submit Answer
-              </button>
-            </div>
-          ) : (
-            <div className="flex-1 flex flex-col animate-in slide-in-from-right-8 duration-500">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-20 h-20 rounded-full border-[6px] border-emerald-400 flex items-center justify-center flex-shrink-0 bg-white">
-                  <span className="text-2xl font-black text-emerald-600">100%</span>
-                </div>
-                <div>
-                  <h3 className="text-3xl font-extrabold text-slate-900 mb-2">Amazing job, Alexandre! 🧡</h3>
-                  <p className="text-slate-600 font-medium leading-relaxed">
-                    Great job! You got 6 out of 6 points for showing all your steps. Keep it up!
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mt-auto mb-6">
-                <h4 className="font-bold text-slate-800 text-sm mb-2">Explanation / Explication</h4>
-                <ol className="text-slate-600 text-sm space-y-2">
-                  <li><strong>1.</strong> $3x + 12 = 27$</li>
-                  <li><strong>2.</strong> Subtract 12: $3x = 15$</li>
-                  <li><strong>3.</strong> Divide by 3: $x = 5$</li>
-                </ol>
-              </div>
-
+          <div className="flex-grow flex flex-col gap-6 overflow-y-auto pb-24">
+            
+            {/* Default Greeting */}
+            {!isSubmitted && (
               <div className="flex gap-4">
-                <button onClick={handleNext} className="flex-1 bg-[#10B981] text-white font-bold py-4 rounded-xl shadow-md hover:bg-emerald-600 transition flex items-center justify-center gap-2">
-                  Next Exercise {exerciseNum + 1} <span className="text-xl">→</span>
-                </button>
-                <button className="px-6 bg-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-300 transition">
-                  Review
-                </button>
+                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xl shrink-0">🤖</div>
+                <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl rounded-tl-none text-slate-600">
+                  Hi Alexandre! Take your time with this one. Remember the golden rule of algebra: whatever you do to one side, you must do to the other.
+                </div>
               </div>
+            )}
+
+            {/* AI Feedback State */}
+            {isSubmitted && (
+              <div className="flex gap-4 animate-in slide-in-from-bottom-4 fade-in duration-300">
+                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xl shrink-0">🤖</div>
+                <div className={`p-5 rounded-3xl rounded-tl-none border ${isCorrect ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-amber-50 border-amber-100 text-amber-800'}`}>
+                  {isCorrect ? (
+                    <>
+                      <strong className="block text-lg mb-2">Amazing job! 🎉</strong>
+                      You subtracted 5 to get 3x = 15, and then divided by 3 perfectly. You're mastering this concept!
+                    </>
+                  ) : (
+                    <>
+                      <strong className="block text-lg mb-2">Not quite, but you're close! 💪</strong>
+                      It looks like you might have added 5 instead of subtracting it. Let's try isolating the 3x first by subtracting 5 from both sides. Give it another shot!
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Action Bar */}
+          {isSubmitted && (
+            <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white to-transparent">
+              {isCorrect ? (
+                <button onClick={handleNext} className="w-full bg-[#4338CA] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-indigo-800 transition text-lg flex justify-center items-center gap-2 animate-in zoom-in duration-300">
+                  Next Exercise <ChevronLeft size={20} className="transform rotate-180" />
+                </button>
+              ) : (
+                <button onClick={() => setIsSubmitted(false)} className="w-full bg-white border-2 border-[#4338CA] text-[#4338CA] font-bold py-4 rounded-xl shadow-sm hover:bg-indigo-50 transition text-lg flex justify-center items-center gap-2 animate-in zoom-in duration-300">
+                  Try Again
+                </button>
+              )}
             </div>
           )}
-        </div>
 
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
