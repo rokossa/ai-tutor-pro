@@ -43,6 +43,19 @@ export default function PracticeArena() {
       const data = await response.json();
       setIsCorrect(data.isCorrect);
       setAiFeedback(data.feedback);
+      
+      // Silently update the database if we have an active student
+      const activeStudentId = localStorage.getItem('active_student_id');
+      if (activeStudentId) {
+        fetch(`${apiUrl}/family/students/${activeStudentId}/progress`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('ai_tutor_token')}`
+          },
+          body: JSON.stringify({ isCorrect: data.isCorrect })
+        }).catch(err => console.error("Background progress sync failed", err));
+      }
     } catch (error) {
       setIsCorrect(false);
       setAiFeedback("Whoops, my connection dropped for a second! Mind hitting submit again?");

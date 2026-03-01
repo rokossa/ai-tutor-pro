@@ -7,4 +7,5 @@ router.post('/student', express.json(), familyController.addStudent);
 router.get('/students', familyController.getStudents);
 router.get('/students/:id', familyController.getStudentProfile);
 
+router.post('/students/:id/progress', express.json(), familyController.updateProgress);
 module.exports = router;

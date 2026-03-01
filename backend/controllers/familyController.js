@@ -81,3 +81,32 @@ exports.getStudentProfile = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch student profile." });
   }
 };
+
+// Update a student's progress after an exercise
+exports.updateProgress = async (req, res) => {
+  try {
+    const { isCorrect } = req.body;
+    const student = await Student.findById(req.params.id);
+    
+    if (!student) return res.status(404).json({ error: "Student not found" });
+
+    // Always increment total exercises attempted
+    student.totalExercises += 1;
+
+    // Only boost stats if they got it right (keeps it encouraging!)
+    if (isCorrect) {
+      student.correctAnswers += 1;
+      student.streak += 1; 
+    }
+
+    await student.save();
+    
+    // Calculate the new rolling average to send back to the frontend
+    const averageScore = Math.round((student.correctAnswers / student.totalExercises) * 100);
+
+    res.status(200).json({ success: true, student, averageScore });
+  } catch (error) {
+    console.error("Update Progress Error:", error);
+    res.status(500).json({ error: "Failed to update progress." });
+  }
+};

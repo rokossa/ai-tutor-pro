@@ -72,7 +72,7 @@ export default function ParentDashboard() {
                   </div>
                 </div>
 
-                <Link to={`/parent/child/${student._id}`} className="block w-full text-center bg-slate-50 border border-slate-200 text-slate-700 font-bold py-4 rounded-xl hover:bg-slate-100 transition">
+                <Link to={`/parent/child/${student._id}`} onClick={() => localStorage.setItem('active_student_id', student._id)} className="block w-full text-center bg-slate-50 border border-slate-200 text-slate-700 font-bold py-4 rounded-xl hover:bg-slate-100 transition">
                   View Detailed Progress
                 </Link>
               </div>

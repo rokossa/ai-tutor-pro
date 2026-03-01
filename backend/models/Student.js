@@ -6,7 +6,9 @@ const StudentSchema = new mongoose.Schema({
   email: { type: String },
   grade: { type: String },
   province: { type: String },
-  streak: { type: Number, default: 0 }
+  streak: { type: Number, default: 0 },
+  totalExercises: { type: Number, default: 0 },
+  correctAnswers: { type: Number, default: 0 }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Student', StudentSchema);
