@@ -10,7 +10,8 @@ const connectDB = async () => {
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`❌ MongoDB Connection Error: ${error.message}`);
-    process.exit(1);
+    console.warn("⚠️ Server is staying alive, but database features will not work until the MONGO_URI password is fixed.");
+    // We completely removed process.exit(1) so the server doesn't crash!
   }
 };
 
