@@ -1,46 +1,43 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Initialize the Gemini SDK. Ensure GEMINI_API_KEY is in your Render Environment Variables.
+// Initialize Gemini with your API key
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'mock_key');
 
-exports.generateCustomExercise = async (req, res) => {
+exports.gradeAnswer = async (req, res) => {
   try {
-    const { prompt, studentName, grade } = req.body;
+    const { question, answer, correctAnswer } = req.body;
 
-    if (!process.env.GEMINI_API_KEY) {
-      console.warn("No GEMINI_API_KEY found. Returning mock data for UI testing.");
-      return res.status(200).json({
-        success: true,
-        exercises: [
-          { question: `${studentName} scores 3 three-pointers and 4 free throws (worth 1 point each). How many points did they score in total?`, answer: "13 points" },
-          { question: `If ${studentName}'s team scores 85 points and the opponent scores 72, what is the point differential?`, answer: "13 points" }
-        ]
-      });
-    }
+    // We use the fast and efficient Gemini 1.5 Flash model for real-time tutoring
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    // The Secret Sauce: The System Prompt
+    const prompt = `You are an empathetic, encouraging tutor helping a 13-year-old Grade 8 student who sometimes finds academics challenging. You love using basketball analogies to make math concepts intuitive and fun.
 
-    // We strictly enforce JSON output so the React frontend can easily render the cards
-    const systemInstruction = `
-      You are an expert ${grade} curriculum designer. 
-      Generate exactly 3 custom practice exercises based on this request: "${prompt}".
-      The student's name is ${studentName}. Incorporate their name and interests.
-      
-      Return EXACTLY a valid JSON array of objects, with no markdown formatting or backticks.
-      Format: [{"question": "The scenario...", "answer": "The solution..."}]
-    `;
+    Question: ${question}
+    Student's Answer: ${answer}
+    Target/Correct Answer: ${correctAnswer}
 
-    const result = await model.generateContent(systemInstruction);
-    const responseText = result.response.text();
+    Evaluate the student's answer. 
+    - If they are correct: Congratulate them warmly!
+    - If they are incorrect: Gently guide them toward the right step. Do NOT just say "wrong". Help them see the next move, perhaps using a quick basketball analogy (like missing a free throw but adjusting the stance).
+
+    Respond ONLY with a valid JSON object in this exact format, with no markdown formatting or backticks:
+    {
+      "isCorrect": true or false,
+      "feedback": "Your encouraging message here"
+    }`;
+
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text().trim().replace(/```json/g, '').replace(/```/g, '');
     
-    // Clean the output just in case the model adds markdown backticks
-    const cleanedJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-    const exercises = JSON.parse(cleanedJson);
+    const parsedResponse = JSON.parse(responseText);
 
-    res.status(200).json({ success: true, exercises });
-
+    res.status(200).json(parsedResponse);
   } catch (error) {
-    console.error("Gemini Generation Error:", error);
-    res.status(500).json({ error: "Failed to generate custom exercises." });
+    console.error("Gemini API Error:", error);
+    res.status(500).json({ 
+      isCorrect: false, 
+      feedback: "Looks like my brain is updating! Let's try submitting that answer one more time." 
+    });
   }
 };

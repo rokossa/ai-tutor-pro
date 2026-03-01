@@ -1,38 +1,61 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ChevronLeft, Send, Lightbulb, Sparkles, Flame } from 'lucide-react';
+import { ChevronLeft, Send, Lightbulb, Sparkles, Flame, Loader2 } from 'lucide-react';
 
 export default function PracticeArena() {
   const { course, chapter } = useParams();
+  const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
   
   // Interactive State
   const [answer, setAnswer] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(null);
+  const [aiFeedback, setAiFeedback] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 10;
 
-  // Mock Question Data (In a real app, this comes from your backend)
+  // Mock Question (Later, this will be fetched from your DB based on the chapter)
   const currentQuestion = {
     text: "Solve for x:  3x + 5 = 20",
     hint: "Think about what you need to do to get 3x by itself first. What happens if you subtract 5 from both sides?",
     correctAnswer: "5"
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!answer) return;
+    if (!answer.trim()) return;
     
-    // Simple mock grading logic
-    const correct = answer.trim() === currentQuestion.correctAnswer;
-    setIsCorrect(correct);
+    setIsLoading(true);
     setIsSubmitted(true);
+
+    try {
+      const response = await fetch(`${apiUrl}/ai/grade`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: currentQuestion.text,
+          answer: answer,
+          correctAnswer: currentQuestion.correctAnswer
+        })
+      });
+
+      const data = await response.json();
+      setIsCorrect(data.isCorrect);
+      setAiFeedback(data.feedback);
+    } catch (error) {
+      setIsCorrect(false);
+      setAiFeedback("Whoops, my connection dropped for a second! Mind hitting submit again?");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleNext = () => {
     setAnswer('');
     setIsSubmitted(false);
     setIsCorrect(null);
+    setAiFeedback('');
     if (currentStep < totalSteps) {
       setCurrentStep(prev => prev + 1);
     }
@@ -44,7 +67,7 @@ export default function PracticeArena() {
       {/* Top Header / Progress Bar */}
       <header className="bg-white border-b border-slate-200 h-16 flex items-center px-4 sm:px-8 justify-between shrink-0">
         <div className="flex items-center gap-4">
-          <Link to="/student/dashboard" className="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-600 transition">
+          <Link to="/parent/dashboard" className="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-600 transition">
             <ChevronLeft size={20} />
           </Link>
           <div>
@@ -84,10 +107,10 @@ export default function PracticeArena() {
                   type="text" 
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
-                  disabled={isSubmitted && isCorrect}
+                  disabled={isSubmitted && (isCorrect || isLoading)}
                   placeholder="Type your answer here..."
                   className={`w-full text-2xl p-6 rounded-2xl outline-none border-2 transition-all ${
-                    isSubmitted 
+                    isSubmitted && !isLoading
                       ? isCorrect 
                         ? 'border-emerald-400 bg-emerald-50 text-emerald-800' 
                         : 'border-amber-400 bg-amber-50 text-amber-800'
@@ -102,13 +125,6 @@ export default function PracticeArena() {
                 )}
               </form>
             </div>
-
-            {/* Hint Button */}
-            {!isSubmitted && (
-              <button className="flex items-center gap-2 text-[#4338CA] font-bold hover:bg-indigo-50 px-4 py-2 rounded-xl transition mx-auto">
-                <Lightbulb size={20} /> Need a hint?
-              </button>
-            )}
           </div>
         </div>
 
@@ -133,34 +149,34 @@ export default function PracticeArena() {
               <div className="flex gap-4">
                 <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xl shrink-0">🤖</div>
                 <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl rounded-tl-none text-slate-600">
-                  Hi Alexandre! Take your time with this one. Remember the golden rule of algebra: whatever you do to one side, you must do to the other.
+                  Take your time with this one. Remember the golden rule of algebra: whatever you do to one side, you must do to the other. Let me know what you get!
                 </div>
               </div>
             )}
 
-            {/* AI Feedback State */}
-            {isSubmitted && (
+            {/* Loading State */}
+            {isLoading && (
+              <div className="flex gap-4 animate-in fade-in duration-300">
+                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xl shrink-0">🤖</div>
+                <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl rounded-tl-none text-indigo-800 flex items-center gap-3">
+                  <Loader2 className="animate-spin" size={20} /> Evaluating your answer...
+                </div>
+              </div>
+            )}
+
+            {/* Real Gemini AI Feedback State */}
+            {isSubmitted && !isLoading && (
               <div className="flex gap-4 animate-in slide-in-from-bottom-4 fade-in duration-300">
                 <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xl shrink-0">🤖</div>
                 <div className={`p-5 rounded-3xl rounded-tl-none border ${isCorrect ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-amber-50 border-amber-100 text-amber-800'}`}>
-                  {isCorrect ? (
-                    <>
-                      <strong className="block text-lg mb-2">Amazing job! 🎉</strong>
-                      You subtracted 5 to get 3x = 15, and then divided by 3 perfectly. You're mastering this concept!
-                    </>
-                  ) : (
-                    <>
-                      <strong className="block text-lg mb-2">Not quite, but you're close! 💪</strong>
-                      It looks like you might have added 5 instead of subtracting it. Let's try isolating the 3x first by subtracting 5 from both sides. Give it another shot!
-                    </>
-                  )}
+                   {aiFeedback}
                 </div>
               </div>
             )}
           </div>
 
           {/* Bottom Action Bar */}
-          {isSubmitted && (
+          {isSubmitted && !isLoading && (
             <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white to-transparent">
               {isCorrect ? (
                 <button onClick={handleNext} className="w-full bg-[#4338CA] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-indigo-800 transition text-lg flex justify-center items-center gap-2 animate-in zoom-in duration-300">
