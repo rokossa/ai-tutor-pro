@@ -1,45 +1,42 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const FacebookStrategy = require('passport-facebook').Strategy;
+const User = require('../models/User');
 
-// Google OAuth Strategy
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID || 'mock_google_id',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'mock_google_secret',
     callbackURL: "/api/auth/google/callback",
     proxy: true
   },
-  function(accessToken, refreshToken, profile, cb) {
-    // In a production app, you would find or create the user in your PostgreSQL database here.
-    const user = { 
-      id: profile.id, 
-      name: profile.displayName, 
-      email: profile.emails?.[0]?.value, 
-      role: 'parent',
-      provider: 'google'
-    };
-    return cb(null, user);
-  }
-));
+  async function(accessToken, refreshToken, profile, cb) {
+    try {
+      // 1. Check if user already exists in MongoDB
+      let user = await User.findOne({ googleId: profile.id });
+      
+      // 2. If not, create and save them permanently
+      if (!user) {
+        // Also check if they exist by email first to prevent duplicates
+        let existingEmail = await User.findOne({ email: profile.emails?.[0]?.value });
+        if (existingEmail) {
+           existingEmail.googleId = profile.id;
+           await existingEmail.save();
+           return cb(null, existingEmail);
+        }
 
-// Facebook OAuth Strategy
-passport.use(new FacebookStrategy({
-    clientID: process.env.FACEBOOK_APP_ID || 'mock_fb_id',
-    clientSecret: process.env.FACEBOOK_APP_SECRET || 'mock_fb_secret',
-    callbackURL: "/api/auth/facebook/callback",
-    profileFields: ['id', 'displayName', 'emails'],
-    proxy: true
-  },
-  function(accessToken, refreshToken, profile, cb) {
-    // Database logic goes here
-    const user = { 
-      id: profile.id, 
-      name: profile.displayName, 
-      email: profile.emails?.[0]?.value, 
-      role: 'parent',
-      provider: 'facebook'
-    };
-    return cb(null, user);
+        user = await User.create({
+          googleId: profile.id,
+          name: profile.displayName,
+          email: profile.emails?.[0]?.value,
+          role: 'parent'
+        });
+      }
+      
+      // 3. Return the real database user!
+      return cb(null, user);
+    } catch (err) {
+      console.error("Passport DB Error:", err);
+      return cb(err, null);
+    }
   }
 ));
 
