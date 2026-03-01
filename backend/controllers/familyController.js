@@ -45,3 +45,39 @@ exports.addStudent = async (req, res) => {
     res.status(500).json({ error: "Failed to add student and send email." });
   }
 };
+
+// Fetch all students for the logged-in parent
+exports.getStudents = async (req, res) => {
+  try {
+    // In production, this ID comes from the JWT token: req.user.id
+    // For now, we fetch all or use a fallback mechanism
+    const parentId = req.user?.id || '65c1234567890abcdef12345'; 
+    const students = await Student.find({ parentId });
+    res.status(200).json({ success: true, students });
+  } catch (error) {
+    console.error("Fetch Students Error:", error);
+    res.status(500).json({ error: "Failed to fetch students." });
+  }
+};
+
+// Fetch a specific student's detailed profile
+exports.getStudentProfile = async (req, res) => {
+  try {
+    const student = await Student.findById(req.params.id);
+    if (!student) return res.status(404).json({ error: "Student not found" });
+    
+    // Here we would also fetch their recent exercise history from an Exercises table.
+    // We will attach some mock analytics to the real DB profile for the UI layout.
+    const profileData = {
+      ...student.toObject(),
+      averageScore: 82, // Dynamic calculation goes here later
+      totalExercises: 145,
+      chartData: [65, 72, 78, 85, 82]
+    };
+
+    res.status(200).json({ success: true, student: profileData });
+  } catch (error) {
+    console.error("Fetch Student Profile Error:", error);
+    res.status(500).json({ error: "Failed to fetch student profile." });
+  }
+};
