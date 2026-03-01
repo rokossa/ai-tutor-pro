@@ -1,34 +1,38 @@
 const express = require('express');
-const router = express.Router();
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
+const router = express.Router();
 
-// Helper function to generate token and redirect to frontend
-const handleOAuthLogin = (req, res) => {
-  // Generate a secure JWT containing the user payload
-  const token = jwt.sign(req.user, process.env.JWT_SECRET || 'evolveai_hackathon_secret', { expiresIn: '7d' });
-  
-  // Redirect back to the React app's AuthSuccess route
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-  res.redirect(`${frontendUrl}/auth-success?token=${token}`);
-};
+// 1. Send the user to Google
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// --- Standard Email/Password Auth (Placeholder) ---
-router.post('/register', (req, res) => res.status(200).json({ success: true, message: 'Email registration hit' }));
-router.post('/login', (req, res) => res.status(200).json({ success: true, message: 'Email login hit' }));
-
-// --- Google OAuth Routes ---
-// 1. Redirects user to Google's consent screen
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
-
-// 2. Google redirects back here with the authorization code
-router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: '/login' }), handleOAuthLogin);
-
-// --- Facebook OAuth Routes ---
-// 1. Redirects user to Facebook's consent screen
-router.get('/facebook', passport.authenticate('facebook', { scope: ['email'], session: false }));
-
-// 2. Facebook redirects back here with the authorization code
-router.get('/facebook/callback', passport.authenticate('facebook', { session: false, failureRedirect: '/login' }), handleOAuthLogin);
+// 2. Catch the user coming back from Google
+router.get('/google/callback', 
+  passport.authenticate('google', { session: false, failureRedirect: '/login' }),
+  (req, res) => {
+    try {
+      // If we made it here, Passport successfully saved/found the user in MongoDB!
+      const payload = { 
+        id: req.user._id || req.user.id, 
+        role: req.user.role || 'parent' 
+      };
+      
+      // Fallback secret prevents fatal crashes if environment variable is missing
+      const secret = process.env.JWT_SECRET || 'temporary_development_secret_key';
+      const token = jwt.sign(payload, secret, { expiresIn: '7d' });
+      
+      // Fallback URL ensures we always know where to send the user
+      const frontendUrl = process.env.FRONTEND_URL || 'https://ai-tutor-pro-k88k.onrender.com';
+      
+      res.redirect(`${frontendUrl}/auth-success?token=${token}`);
+    } catch (error) {
+      console.error("🔥 JWT or Redirect Error:", error);
+      res.status(500).json({ 
+        error: "Failed to generate token or redirect", 
+        details: error.message 
+      });
+    }
+  }
+);
 
 module.exports = router;
