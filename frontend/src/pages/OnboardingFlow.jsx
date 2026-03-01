@@ -37,13 +37,13 @@ export default function OnboardingFlow() {
       // Simulate a slight network delay so the user sees the loading state
       setTimeout(() => {
         setIsSending(false);
-        navigate('/dashboard/parent');
+        navigate('/parent/dashboard');
       }, 800);
 
     } catch (error) {
       console.error("Failed to trigger email service:", error);
       setIsSending(false);
-      navigate('/dashboard/parent'); // Failsafe: still push them to dashboard
+      navigate('/parent/dashboard'); // Failsafe: still push them to dashboard
     }
   };
 

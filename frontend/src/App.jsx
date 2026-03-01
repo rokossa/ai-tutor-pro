@@ -78,6 +78,10 @@ function App() {
           <Route path="/onboarding/*" element={<OnboardingFlow />} />
 
           {/* 4. PARENT EXPERIENCE */}
+          {/* Legacy Route Catchers */}
+          <Route path="/dashboard/parent" element={<Navigate to="/parent/dashboard" replace />} />
+          <Route path="/dashboard/student" element={<Navigate to="/student/dashboard" replace />} />
+          <Route path="/dashboard/tutor" element={<Navigate to="/tutor/dashboard" replace />} />
           <Route path="/parent/dashboard" element={<ParentDashboard />} />
           <Route path="/parent/children" element={<ParentDashboard />} />
           <Route path="/parent/child/:childId" element={<ChildProfile />} />
