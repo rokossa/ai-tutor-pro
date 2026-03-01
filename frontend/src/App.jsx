@@ -19,6 +19,7 @@ const NotFound = React.lazy(() => import('./pages/errors/NotFound'));
 
 // 2. Auth Pages
 const ParentSignup = React.lazy(() => import('./pages/ParentSignup'));
+const AuthSuccess = React.lazy(() => import('./pages/AuthSuccess'));
 const ForgotPassword = React.lazy(() => import('./pages/auth/ForgotPassword'));
 const ResetPassword = React.lazy(() => import('./pages/auth/ResetPassword'));
 const MagicLogin = React.lazy(() => import('./pages/auth/MagicLogin'));
@@ -68,6 +69,7 @@ function App() {
           {/* 2. AUTHENTICATION ROUTES */}
           <Route path="/login" element={<ParentSignup />} /> 
           <Route path="/register" element={<ParentSignup />} />
+          <Route path="/auth-success" element={<AuthSuccess />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/auth/magic/:token" element={<MagicLogin />} />
