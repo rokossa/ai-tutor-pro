@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const aiController = require('../controllers/aiController');
+const { generateProblem } = require('../controllers/aiController');
+const { protect } = require('../middleware/auth');
 
-// Standard JSON endpoint for grading answers via Gemini
-router.post('/grade', express.json(), aiController.gradeAnswer);
+router.post('/generate', protect, generateProblem);
 
 module.exports = router;
