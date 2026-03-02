@@ -4,16 +4,15 @@ import GlobalNavbar from './components/GlobalNavbar';
 import GlobalFooter from './components/GlobalFooter';
 import SmartHome from './components/SmartHome';
 
-// Lazy load pages for performance
-const Login = React.lazy(() => import('./pages/auth/Login'));
-const AuthSuccess = React.lazy(() => import('./pages/auth/AuthSuccess'));
-const Welcome = React.lazy(() => import('./pages/onboarding/Welcome'));
-const AddChild = React.lazy(() => import('./pages/onboarding/AddChild'));
-const AddCurriculum = React.lazy(() => import('./pages/onboarding/AddCurriculum'));
-const InviteTutor = React.lazy(() => import('./pages/onboarding/InviteTutor'));
+// Lazy loading the EXACT files verified from your directory
+const ParentSignup = React.lazy(() => import('./pages/ParentSignup'));
+const AuthSuccess = React.lazy(() => import('./pages/AuthSuccess'));
+const OnboardingFlow = React.lazy(() => import('./pages/OnboardingFlow'));
 const Pricing = React.lazy(() => import('./pages/public/Pricing'));
 const ParentDashboard = React.lazy(() => import('./pages/dashboard/ParentDashboard'));
+const Settings = React.lazy(() => import('./pages/dashboard/Settings'));
 const PracticeArena = React.lazy(() => import('./pages/PracticeArena'));
+const NotFound = React.lazy(() => import('./pages/errors/NotFound'));
 
 function App() {
   return (
@@ -27,21 +26,20 @@ function App() {
             </div>
           }>
             <Routes>
-              {/* Public Routes */}
+              {/* Core Routes */}
               <Route path="/" element={<SmartHome />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/login" element={<ParentSignup />} />
               <Route path="/auth-success" element={<AuthSuccess />} />
+              <Route path="/pricing" element={<Pricing />} />
               
-              {/* Onboarding Flow */}
-              <Route path="/onboarding/welcome" element={<Welcome />} />
-              <Route path="/onboarding/add-child" element={<AddChild />} />
-              <Route path="/onboarding/curriculum" element={<AddCurriculum />} />
-              <Route path="/onboarding/invite-tutor" element={<InviteTutor />} />
-              
-              {/* Dashboard & Practice */}
+              {/* Authenticated Routes */}
+              <Route path="/onboarding/*" element={<OnboardingFlow />} />
               <Route path="/parent/dashboard" element={<ParentDashboard />} />
+              <Route path="/parent/settings" element={<Settings />} />
               <Route path="/practice/:course/:chapter" element={<PracticeArena />} />
+              
+              {/* Fallback */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </main>
