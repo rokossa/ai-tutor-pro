@@ -1,31 +1,20 @@
+const crypto = require('crypto');
 const User = require('../models/User');
-const Family = require('../models/Family');
+const { sendTutorInviteEmail } = require('../services/emailService');
 
-exports.registerTutor = async (req, res) => {
+exports.generateInviteLink = async (req, res) => {
   try {
-    const { email, password, firstName, lastName, subjects, bio, inviteCode } = req.body;
+    const { studentId, tutorEmail } = req.body;
+    const inviteToken = crypto.randomBytes(32).toString('hex');
     
-    // Verify the invitation link/code exists in a family
-    const family = await Family.findOne({ "inviteCodes.code": inviteCode });
-    if (!family) return res.status(400).json({ error: "Invalid or expired invitation link." });
+    // Logic to store the token and link it to the student
+    const inviteUrl = `https://ai-tutor-pro-k88k.onrender.com/register?token=${inviteToken}&role=tutor`;
 
-    // Create the Tutor User
-    const user = new User({
-      email,
-      passwordHash: password, // In prod, use bcrypt.hash
-      role: 'tutor',
-      profile: { firstName, lastName, bio, subjectsTaught: subjects }
-    });
-    await user.save();
+    // Trigger the personalized HTML email to Ms. Patel
+    await sendTutorInviteEmail(tutorEmail, inviteUrl, req.user.name);
 
-    // Link Tutor to Family
-    family.tutors.push({ tutorId: user._id, permissions: { canViewProgress: true } });
-    // Remove used invite code
-    family.inviteCodes = family.inviteCodes.filter(c => c.code !== inviteCode);
-    await family.save();
-
-    res.status(201).json({ success: true, message: "Tutor account created and linked to student." });
+    res.json({ success: true, message: "Handshake invite sent to tutor." });
   } catch (error) {
-    res.status(500).json({ error: "Failed to register tutor." });
+    res.status(500).json({ error: "Failed to generate tutor invite." });
   }
 };
