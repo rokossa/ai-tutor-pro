@@ -1,29 +1,25 @@
 const User = require('../models/User');
-const VerificationToken = require('../models/VerificationToken');
-const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
+const { sendWelcomeEmail, sendTutorAssignmentEmail } = require('../services/emailService');
 
-exports.registerParent = async (req, res) => {
+exports.register = async (req, res) => {
   try {
-    const { email, password, firstName, lastName, region } = req.body;
-    let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ error: "User already exists" });
-
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
-
-    user = new User({
-      email, passwordHash, role: 'parent',
-      profile: { firstName, lastName, region }
-    });
-    await user.save();
-
-    const token = crypto.randomBytes(32).toString('hex');
-    await new VerificationToken({ userId: user._id, token }).save();
-
-    console.log(`Verification link: http://localhost:5173/verify-email?token=${token}`);
-    res.status(201).json({ success: true, message: "Registration successful." });
+    const { name, email, password, role, tutorId } = req.body;
+    const user = await User.create({ name, email, password, role, assignedTutor: tutorId });
+    
+    // LIVE TRIGGER: Send the nice onboarding email immediately
+    await sendWelcomeEmail(user);
+    
+    res.status(201).json({ success: true, user });
   } catch (error) {
-    res.status(500).json({ error: "Server error during registration." });
+    res.status(400).json({ error: error.message });
   }
+};
+
+exports.assignTutor = async (req, res) => {
+  try {
+    const { studentId, tutorId } = req.body;
+    // Logic to update DB and then...
+    await sendTutorAssignmentEmail(studentId, tutorId);
+    res.json({ success: true, message: "Tutor assigned and notified." });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 };

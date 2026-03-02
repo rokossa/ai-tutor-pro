@@ -4,9 +4,7 @@ import { User, Download, Users, GraduationCap, Star } from 'lucide-react';
 export default function ParentDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
 
-  const children = [
-    { name: 'Alexandre', grade: '8th Grade', streak: '5 days', score: '92%' }
-  ];
+  const [children, setChildren] = useState([]);
 
   const assignedTutors = [
     { name: 'Ms. Patel', specialty: 'Mathematics & Physics', rating: 4.9, students: ['Alexandre'] }
