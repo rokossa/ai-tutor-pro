@@ -1,210 +1,110 @@
-import React, { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { ChevronLeft, Send, Lightbulb, Sparkles, Flame, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Send, Sparkles, ChevronLeft, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function PracticeArena() {
   const { course, chapter } = useParams();
-  const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
-  
-  // Interactive State
-  const [answer, setAnswer] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(null);
-  const [aiFeedback, setAiFeedback] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 10;
+  const [answer, setAnswer] = useState('');
+  const [feedback, setFeedback] = useState({ type: 'hint', message: "Hi Alexandre! Let's look at this linear equation. What's our first step to isolate x?" });
 
-  // Mock Question (Later, this will be fetched from your DB based on the chapter)
-  const currentQuestion = {
-    text: "Solve for x:  3x + 5 = 20",
-    hint: "Think about what you need to do to get 3x by itself first. What happens if you subtract 5 from both sides?",
-    correctAnswer: "5"
+  // Mocked problem data
+  const problem = {
+    title: "Linear Equations",
+    question: "Solve for x: 3x + 12 = 36",
+    difficulty: "Grade 8"
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!answer.trim()) return;
-    
-    setIsLoading(true);
-    setIsSubmitted(true);
-
-    try {
-      const response = await fetch(`${apiUrl}/ai/grade`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: currentQuestion.text,
-          answer: answer,
-          correctAnswer: currentQuestion.correctAnswer
-        })
-      });
-
-      const data = await response.json();
-      setIsCorrect(data.isCorrect);
-      setAiFeedback(data.feedback);
-      
-      // Silently update the database if we have an active student
-      const activeStudentId = localStorage.getItem('active_student_id');
-      if (activeStudentId) {
-        fetch(`${apiUrl}/family/students/${activeStudentId}/progress`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('ai_tutor_token')}`
-          },
-          body: JSON.stringify({ isCorrect: data.isCorrect })
-        }).catch(err => console.error("Background progress sync failed", err));
-      }
-    } catch (error) {
-      setIsCorrect(false);
-      setAiFeedback("Whoops, my connection dropped for a second! Mind hitting submit again?");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleNext = () => {
-    setAnswer('');
-    setIsSubmitted(false);
-    setIsCorrect(null);
-    setAiFeedback('');
-    if (currentStep < totalSteps) {
-      setCurrentStep(prev => prev + 1);
+    if (answer === '8') {
+      setFeedback({ type: 'success', message: "Spot on! 3(8) is 24, and 24 + 12 = 36. Ready for the next one?" });
+    } else {
+      setFeedback({ type: 'error', message: "Not quite. Try subtracting 12 from both sides first. What do you get?" });
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F4F4F5] font-sans">
+    <div className="min-h-screen bg-[#Eef0f4] flex flex-col font-sans">
       
-      {/* Top Header / Progress Bar */}
-      <header className="bg-white border-b border-slate-200 h-16 flex items-center px-4 sm:px-8 justify-between shrink-0">
-        <div className="flex items-center gap-4">
-          <Link to="/parent/dashboard" className="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-600 transition">
-            <ChevronLeft size={20} />
-          </Link>
-          <div>
-            <h1 className="text-lg font-bold text-slate-900 capitalize">{course || 'Math'} • {chapter?.replace('-', ' ') || 'Linear Equations'}</h1>
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Exercise {currentStep} of {totalSteps}</div>
-          </div>
-        </div>
+      {/* Top Header & Progress Bar */}
+      <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm">
+        <button onClick={() => navigate('/student/dashboard')} className="flex items-center gap-2 text-slate-500 font-bold hover:text-slate-800 transition">
+          <ChevronLeft size={20} /> Exit
+        </button>
         
-        <div className="flex items-center gap-6">
-          <div className="hidden sm:flex items-center gap-2">
-            <div className="w-48 h-3 bg-slate-100 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-[#4338CA] to-purple-500 transition-all duration-500"
-                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-              ></div>
-            </div>
+        <div className="flex flex-col items-center flex-grow max-w-md px-8">
+          <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden mb-1">
+            <div className="bg-[#4338CA] h-full transition-all duration-500" style={{ width: `${(currentStep / 10) * 100}%` }}></div>
           </div>
-          <div className="flex items-center gap-2 bg-orange-100 text-orange-600 px-3 py-1.5 rounded-xl font-bold text-sm">
-            <Flame size={16} className="fill-current" /> 4 Days
-          </div>
-        </div>
-      </header>
-
-      {/* Split Screen Workspace */}
-      <main className="flex-grow flex flex-col lg:flex-row overflow-hidden">
-        
-        {/* LEFT: The Question Workspace */}
-        <div className="flex-1 p-6 sm:p-12 overflow-y-auto flex flex-col justify-center">
-          <div className="max-w-2xl mx-auto w-full">
-            <div className="bg-white rounded-[2rem] p-10 shadow-sm border border-slate-200 mb-8">
-              <h2 className="text-2xl font-medium text-slate-700 mb-8 leading-relaxed">
-                {currentQuestion.text}
-              </h2>
-              
-              <form onSubmit={handleSubmit} className="relative">
-                <input 
-                  type="text" 
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  disabled={isSubmitted && (isCorrect || isLoading)}
-                  placeholder="Type your answer here..."
-                  className={`w-full text-2xl p-6 rounded-2xl outline-none border-2 transition-all ${
-                    isSubmitted && !isLoading
-                      ? isCorrect 
-                        ? 'border-emerald-400 bg-emerald-50 text-emerald-800' 
-                        : 'border-amber-400 bg-amber-50 text-amber-800'
-                      : 'border-slate-200 bg-slate-50 focus:border-[#4338CA] focus:bg-white'
-                  }`}
-                />
-                
-                {!isSubmitted && (
-                  <button type="submit" className="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-[#4338CA] text-white rounded-xl flex items-center justify-center hover:bg-indigo-800 transition shadow-md">
-                    <Send size={20} />
-                  </button>
-                )}
-              </form>
-            </div>
-          </div>
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Exercise {currentStep} of 10</span>
         </div>
 
-        {/* RIGHT: The AI Tutor Companion */}
-        <div className="lg:w-[450px] bg-white border-l border-slate-200 p-8 flex flex-col relative z-10 shadow-2xl lg:shadow-none">
-          <div className="flex items-center gap-3 mb-8 pb-6 border-b border-slate-100">
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg">
-              <Sparkles size={24} />
+        <div className="flex items-center gap-2 bg-[#14b8a6]/10 text-[#14b8a6] px-4 py-1.5 rounded-full font-black text-xs border border-[#14b8a6]/20">
+          7 DAY STREAK 🔥
+        </div>
+      </div>
+
+      {/* Main Arena Content */}
+      <div className="flex-grow flex flex-col lg:flex-row p-4 sm:p-6 gap-6">
+        
+        {/* Left: AI Tutor Side */}
+        <div className="lg:w-1/3 bg-white/80 backdrop-blur-md rounded-[32px] p-8 shadow-sm border border-white flex flex-col">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <Sparkles size={20} />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-lg">AI Tutor</h3>
-              <p className="text-xs text-emerald-500 font-bold uppercase tracking-wider flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online
-              </p>
+              <h2 className="font-black text-slate-900 leading-tight">AI Tutor</h2>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Your patient guide</p>
             </div>
           </div>
 
-          <div className="flex-grow flex flex-col gap-6 overflow-y-auto pb-24">
-            
-            {/* Default Greeting */}
-            {!isSubmitted && (
-              <div className="flex gap-4">
-                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xl shrink-0">🤖</div>
-                <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl rounded-tl-none text-slate-600">
-                  Take your time with this one. Remember the golden rule of algebra: whatever you do to one side, you must do to the other. Let me know what you get!
-                </div>
-              </div>
-            )}
-
-            {/* Loading State */}
-            {isLoading && (
-              <div className="flex gap-4 animate-in fade-in duration-300">
-                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xl shrink-0">🤖</div>
-                <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl rounded-tl-none text-indigo-800 flex items-center gap-3">
-                  <Loader2 className="animate-spin" size={20} /> Evaluating your answer...
-                </div>
-              </div>
-            )}
-
-            {/* Real Gemini AI Feedback State */}
-            {isSubmitted && !isLoading && (
-              <div className="flex gap-4 animate-in slide-in-from-bottom-4 fade-in duration-300">
-                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xl shrink-0">🤖</div>
-                <div className={`p-5 rounded-3xl rounded-tl-none border ${isCorrect ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-amber-50 border-amber-100 text-amber-800'}`}>
-                   {aiFeedback}
-                </div>
-              </div>
-            )}
+          <div className={`p-6 rounded-[24px] mb-8 text-lg font-medium leading-relaxed shadow-sm border ${
+            feedback.type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-100' : 
+            feedback.type === 'error' ? 'bg-rose-50 text-rose-800 border-rose-100' : 'bg-slate-50 text-slate-700 border-slate-100'
+          }`}>
+            {feedback.message}
           </div>
 
-          {/* Bottom Action Bar */}
-          {isSubmitted && !isLoading && (
-            <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white to-transparent">
-              {isCorrect ? (
-                <button onClick={handleNext} className="w-full bg-[#4338CA] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-indigo-800 transition text-lg flex justify-center items-center gap-2 animate-in zoom-in duration-300">
-                  Next Exercise <ChevronLeft size={20} className="transform rotate-180" />
-                </button>
-              ) : (
-                <button onClick={() => setIsSubmitted(false)} className="w-full bg-white border-2 border-[#4338CA] text-[#4338CA] font-bold py-4 rounded-xl shadow-sm hover:bg-indigo-50 transition text-lg flex justify-center items-center gap-2 animate-in zoom-in duration-300">
-                  Try Again
-                </button>
-              )}
-            </div>
-          )}
-
+          <div className="mt-auto pt-8 border-t border-slate-100 flex items-center gap-4 text-slate-400 font-bold text-xs uppercase italic">
+            Focus: Isolating Variables
+          </div>
         </div>
-      </main>
+
+        {/* Right: Workspace Side */}
+        <div className="flex-1 bg-white rounded-[40px] p-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-slate-100 flex flex-col">
+          <div className="mb-12">
+            <span className="text-xs font-black text-[#4338CA] bg-indigo-50 px-3 py-1 rounded-full uppercase mb-4 inline-block tracking-widest">
+              {course} • {problem.difficulty}
+            </span>
+            <h1 className="text-4xl font-black text-slate-900 mb-6">{problem.title}</h1>
+            <div className="bg-slate-50 rounded-3xl p-10 border border-slate-100 text-3xl font-mono text-center text-slate-800 shadow-inner">
+              {problem.question}
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="mt-auto">
+            <div className="relative">
+              <input 
+                type="text" 
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                placeholder="Type your answer here..."
+                className="w-full bg-[#F8F9FA] border-2 border-slate-200 rounded-[28px] py-6 px-8 text-xl font-bold text-slate-800 focus:border-[#4338CA] focus:ring-0 transition-all outline-none"
+              />
+              <button 
+                type="submit"
+                className="absolute right-3 top-3 bottom-3 bg-[#4338CA] text-white px-8 rounded-2xl font-black hover:bg-indigo-700 transition flex items-center gap-2 shadow-lg"
+              >
+                Submit <Send size={20} />
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
     </div>
   );
 }
