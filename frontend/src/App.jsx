@@ -2,13 +2,15 @@ import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import GlobalNavbar from './components/GlobalNavbar';
 import GlobalFooter from './components/GlobalFooter';
-import './i18n'; // Ensuring translations stay perfectly intact!
 
-// Lazy loading all exact files
+// WAKES UP THE TRANSLATION ENGINE IMMEDIATELY
+import './i18n'; 
+
+// Lazy loading core files
 const LandingPage = React.lazy(() => import('./pages/LandingPage'));
 const ParentSignup = React.lazy(() => import('./pages/ParentSignup'));
 const AuthSuccess = React.lazy(() => import('./pages/AuthSuccess'));
-const MagicLogin = React.lazy(() => import('./pages/auth/MagicLogin')); // <-- The new interceptor
+const MagicLogin = React.lazy(() => import('./pages/auth/MagicLogin'));
 const OnboardingFlow = React.lazy(() => import('./pages/OnboardingFlow'));
 const Pricing = React.lazy(() => import('./pages/public/Pricing'));
 const ParentDashboard = React.lazy(() => import('./pages/dashboard/ParentDashboard'));
@@ -28,11 +30,12 @@ function App() {
             </div>
           }>
             <Routes>
-              {/* Core Routes */}
+              {/* Public & Auth Routes */}
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<ParentSignup />} />
+              <Route path="/register" element={<ParentSignup />} /> {/* <-- FIXES THE 404! */}
               <Route path="/auth-success" element={<AuthSuccess />} />
-              <Route path="/magic-login" element={<MagicLogin />} /> {/* <-- The new route */}
+              <Route path="/magic-login" element={<MagicLogin />} />
               <Route path="/pricing" element={<Pricing />} />
               
               {/* Authenticated Routes */}

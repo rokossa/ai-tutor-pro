@@ -15,12 +15,12 @@ export default function GlobalNavbar() {
     localStorage.removeItem('ai_tutor_token');
     localStorage.removeItem('active_student_id');
     setIsLoggedIn(false);
-    // Force a hard browser redirect to flush all React state and boot the user
-    window.location.href = '/login'; 
+    window.location.href = '/login'; // Hard flush redirect
   };
 
-  // Hide this generic nav on your custom Landing Page and Practice Arena
-  if (location.pathname === '/' || location.pathname.includes('/practice/')) return null;
+  // ONLY hide the navbar in the immersive Practice Arena. 
+  // (We removed the rule hiding it on the '/' homepage!)
+  if (location.pathname.includes('/practice/')) return null;
 
   return (
     <nav className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
