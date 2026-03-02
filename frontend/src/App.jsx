@@ -6,7 +6,7 @@ import GlobalFooter from './components/GlobalFooter';
 // WAKES UP THE TRANSLATION ENGINE IMMEDIATELY
 import './i18n'; 
 
-// Lazy loading core files
+// Lazy loading files
 const LandingPage = React.lazy(() => import('./pages/LandingPage'));
 const ParentSignup = React.lazy(() => import('./pages/ParentSignup'));
 const AuthSuccess = React.lazy(() => import('./pages/AuthSuccess'));
@@ -14,6 +14,8 @@ const MagicLogin = React.lazy(() => import('./pages/auth/MagicLogin'));
 const OnboardingFlow = React.lazy(() => import('./pages/OnboardingFlow'));
 const Pricing = React.lazy(() => import('./pages/public/Pricing'));
 const ParentDashboard = React.lazy(() => import('./pages/dashboard/ParentDashboard'));
+const StudentDashboard = React.lazy(() => import('./pages/dashboard/StudentDashboard'));
+const TutorDashboard = React.lazy(() => import('./pages/dashboard/TutorDashboard')); // <-- NEW
 const Settings = React.lazy(() => import('./pages/dashboard/Settings'));
 const PracticeArena = React.lazy(() => import('./pages/PracticeArena'));
 const NotFound = React.lazy(() => import('./pages/errors/NotFound'));
@@ -33,7 +35,7 @@ function App() {
               {/* Public & Auth Routes */}
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<ParentSignup />} />
-              <Route path="/register" element={<ParentSignup />} /> {/* <-- FIXES THE 404! */}
+              <Route path="/register" element={<ParentSignup />} />
               <Route path="/auth-success" element={<AuthSuccess />} />
               <Route path="/magic-login" element={<MagicLogin />} />
               <Route path="/pricing" element={<Pricing />} />
@@ -41,6 +43,8 @@ function App() {
               {/* Authenticated Routes */}
               <Route path="/onboarding/*" element={<OnboardingFlow />} />
               <Route path="/parent/dashboard" element={<ParentDashboard />} />
+              <Route path="/student/dashboard" element={<StudentDashboard />} />
+              <Route path="/tutor/dashboard" element={<TutorDashboard />} /> {/* <-- MAP NEW ROUTE */}
               <Route path="/parent/settings" element={<Settings />} />
               <Route path="/practice/:course/:chapter" element={<PracticeArena />} />
               
