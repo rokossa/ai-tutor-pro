@@ -2,9 +2,8 @@ import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import GlobalNavbar from './components/GlobalNavbar';
 import GlobalFooter from './components/GlobalFooter';
-import SmartHome from './components/SmartHome';
 
-// Lazy loading the EXACT files verified from your directory
+const LandingPage = React.lazy(() => import('./pages/LandingPage'));
 const ParentSignup = React.lazy(() => import('./pages/ParentSignup'));
 const AuthSuccess = React.lazy(() => import('./pages/AuthSuccess'));
 const OnboardingFlow = React.lazy(() => import('./pages/OnboardingFlow'));
@@ -26,19 +25,16 @@ function App() {
             </div>
           }>
             <Routes>
-              {/* Core Routes */}
-              <Route path="/" element={<SmartHome />} />
+              <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<ParentSignup />} />
               <Route path="/auth-success" element={<AuthSuccess />} />
               <Route path="/pricing" element={<Pricing />} />
               
-              {/* Authenticated Routes */}
               <Route path="/onboarding/*" element={<OnboardingFlow />} />
               <Route path="/parent/dashboard" element={<ParentDashboard />} />
               <Route path="/parent/settings" element={<Settings />} />
               <Route path="/practice/:course/:chapter" element={<PracticeArena />} />
               
-              {/* Fallback */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

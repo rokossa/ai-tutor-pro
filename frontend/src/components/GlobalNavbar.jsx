@@ -15,11 +15,12 @@ export default function GlobalNavbar() {
     localStorage.removeItem('ai_tutor_token');
     localStorage.removeItem('active_student_id');
     setIsLoggedIn(false);
-    navigate('/');
+    // Force a hard browser redirect to flush all React state and boot the user
+    window.location.href = '/login'; 
   };
 
-  // Hide the navbar when in the immersive Practice Arena
-  if (location.pathname.includes('/practice/')) return null;
+  // Hide this generic nav on your custom Landing Page and Practice Arena
+  if (location.pathname === '/' || location.pathname.includes('/practice/')) return null;
 
   return (
     <nav className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
@@ -28,7 +29,6 @@ export default function GlobalNavbar() {
           <div className="w-8 h-8 bg-[#4338CA] rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-md">AI</div>
           <span className="font-extrabold text-xl text-slate-900 tracking-tight">Tutor Pro</span>
         </Link>
-
         <div className="flex items-center gap-6">
           <Link to="/pricing" className="text-sm font-medium text-slate-600 hover:text-[#4338CA] hidden sm:block transition">Pricing</Link>
           {isLoggedIn ? (
@@ -38,6 +38,7 @@ export default function GlobalNavbar() {
                 <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">Connected</span>
               </div>
               <Link to="/parent/dashboard" className="text-sm font-bold text-[#4338CA] hover:text-indigo-800 transition">Dashboard</Link>
+              <Link to="/parent/settings" className="text-sm font-bold text-slate-500 hover:text-[#4338CA] transition">Settings</Link>
               <button onClick={handleLogout} className="text-sm font-medium text-slate-500 hover:text-red-600 transition">Sign Out</button>
             </>
           ) : (
