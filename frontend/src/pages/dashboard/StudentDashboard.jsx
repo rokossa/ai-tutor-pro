@@ -1,61 +1,114 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { BookOpen, ChevronRight, GraduationCap, Atom, Languages, Calculator, History } from 'lucide-react';
 
 export default function StudentDashboard() {
-  const { i18n } = useTranslation();
+  const navigate = useNavigate();
+  const [view, setView] = useState('subjects'); // 'subjects' or 'chapters'
+  const [selectedSubject, setSelectedSubject] = useState(null);
 
-  const toggleLanguage = () => {
-    i18n.changeLanguage(i18n.language === 'en' ? 'fr' : 'en');
+  // Structured Grade 8 Curriculum Map
+  const curriculum = {
+    mathematics: {
+      icon: <Calculator className="text-blue-500" size={40} />,
+      chapters: ["Linear Equations", "Square Roots & Pythagoras", "Fractions & Decimals", "Probability", "Geometry"]
+    },
+    sciences: {
+      icon: <Atom className="text-emerald-500" size={40} />,
+      chapters: ["Cells & Systems", "Fluids", "Water Systems", "Optics"]
+    },
+    french: {
+      icon: <Languages className="text-rose-500" size={40} />,
+      chapters: ["Grammaire", "Vocabulaire", "Compréhension de lecture", "Expression Écrite"]
+    },
+    history: {
+      icon: <History className="text-amber-500" size={40} />,
+      chapters: ["Confederation", "The Development of Western Canada", "Canada's Changing Society"]
+    }
   };
 
-  const courses = [
-    { id: 'math', name: 'Math', icon: '🧮', desc: 'Algebra, Geometry, Trigonometry', frDesc: 'Algèbre, Géométrie, Trigonométrie', color: 'text-blue-600' },
-    { id: 'science', name: 'Science', icon: '🧪', desc: 'Physics, Chemistry, Biology', frDesc: 'Physique, Chimie, Biologie', color: 'text-emerald-600' },
-    { id: 'english', name: 'English', icon: '📖', desc: 'Grammar, Writing, Literature', frDesc: 'Grammaire, Écriture, Littérature', color: 'text-indigo-600' },
-    { id: 'french', name: 'French / Français', icon: '🇫🇷', desc: 'Vocabulary, Conversation', frDesc: 'Vocabulaire, Conversation', color: 'text-red-600' },
-    { id: 'history', name: 'History', icon: '🏛️', desc: 'World History, Canadian History', frDesc: 'Histoire mondiale et canadienne', color: 'text-amber-600' },
-    { id: 'geography', name: 'Geography', icon: '🌍', desc: 'World Geography, Mapping', frDesc: 'Géographie mondiale, Cartographie', color: 'text-teal-600' },
-  ];
+  const handleSubjectClick = (subKey) => {
+    setSelectedSubject({ key: subKey, ...curriculum[subKey] });
+    setView('chapters');
+  };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] font-sans">
-      <header className="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          <span className="text-lg font-medium text-slate-800">Hi <strong>Alexandre</strong> 💥 • Grade 8 Ontario</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <button onClick={toggleLanguage} className="bg-slate-100 w-12 h-6 rounded-full relative flex items-center px-1 cursor-pointer">
-             <div className={`w-4 h-4 bg-indigo-600 rounded-full transition-transform ${i18n.language === 'fr' ? 'translate-x-6' : ''}`}></div>
-             <span className="absolute left-7 text-[10px] font-bold text-slate-500">{i18n.language === 'fr' ? 'FR' : 'EN'}</span>
-          </button>
-          <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-lg">👦🏽</div>
-        </div>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-4 py-12">
-        <h1 className="text-4xl font-extrabold text-slate-900 mb-10 text-center">
-          {i18n.language === 'en' ? 'Choose your Course' : 'Choisis ton Cours'}
-        </h1>
-
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {courses.map(course => (
-            <div key={course.id} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col items-center text-center">
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <span className="text-3xl">{course.icon}</span>
-                <h2 className="text-2xl font-bold text-slate-900">{course.name}</h2>
-              </div>
-              <p className="text-slate-500 text-sm mb-6 h-10">
-                {i18n.language === 'en' ? course.desc : course.frDesc}
-              </p>
-              <Link to={`/course/${course.id}`} className="bg-[#1E1B4B] text-white font-bold py-2.5 px-8 rounded-xl hover:bg-indigo-900 transition shadow-sm w-3/4">
-                {i18n.language === 'en' ? 'Start' : 'Commencer'}
-              </Link>
-              <p className="text-slate-400 text-xs mt-3 font-medium">10+ exercises</p>
+    <div className="min-h-screen bg-[#Eef0f4] p-4 sm:p-8 font-sans flex justify-center">
+      <div className="max-w-5xl w-full bg-[#F4F6FA] rounded-[40px] p-8 sm:p-12 shadow-2xl border border-white/50">
+        
+        {/* Header */}
+        <div className="flex justify-between items-center mb-12">
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md">D</div>
+             <span className="font-black text-2xl text-slate-900 tracking-tighter">Didakt</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-xl font-bold text-slate-800">Hi Alexandre ✨</span>
+            <div className="bg-[#14b8a6] text-white font-bold px-4 py-1.5 rounded-full shadow-sm text-sm uppercase tracking-widest">
+              7 Day Streak
             </div>
-          ))}
+          </div>
         </div>
-      </main>
+
+        {view === 'subjects' ? (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h2 className="text-3xl font-black text-slate-900 mb-8">Grade 8 Topics</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+              {Object.keys(curriculum).map((key) => (
+                <div 
+                  key={key} 
+                  onClick={() => handleSubjectClick(key)}
+                  className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 flex items-center justify-between cursor-pointer hover:-translate-y-1 hover:shadow-md transition group"
+                >
+                  <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-white transition">
+                      {curriculum[key].icon}
+                    </div>
+                    <span className="text-2xl font-bold text-slate-800 capitalize">{key}</span>
+                  </div>
+                  <ChevronRight className="text-slate-300 group-hover:text-slate-900 transition" size={28} />
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="animate-in fade-in slide-in-from-left-4 duration-500">
+            <button 
+              onClick={() => setView('subjects')}
+              className="mb-6 text-slate-400 font-bold flex items-center gap-2 hover:text-slate-900 transition"
+            >
+              &larr; Back to Topics
+            </button>
+            <div className="flex items-center gap-4 mb-8">
+               <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                 {selectedSubject.icon}
+               </div>
+               <h2 className="text-3xl font-black text-slate-900 capitalize">{selectedSubject.key} Curriculum</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-4">
+              {selectedSubject.chapters.map((chapter, idx) => (
+                <div 
+                  key={idx}
+                  onClick={() => navigate(`/practice/${selectedSubject.key}/${chapter.toLowerCase().replace(/ /g, '-')}`)}
+                  className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center justify-between cursor-pointer hover:border-[#4338CA] transition group"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-indigo-50 text-[#4338CA] rounded-full flex items-center justify-center text-xs font-black">
+                      {idx + 1}
+                    </div>
+                    <span className="font-bold text-slate-700 text-lg">{chapter}</span>
+                  </div>
+                  <button className="bg-[#4338CA] text-white font-bold px-6 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition shadow-md">
+                    Start Exercise
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
