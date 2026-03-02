@@ -7,6 +7,10 @@ const connectDB = require('./config/db');
 
 const app = express();
 
+// Developer Backdoor Route
+app.use('/api/dev', require('./routes/dev'));
+
+
 // 1. Connect to MongoDB Atlas
 connectDB();
 
