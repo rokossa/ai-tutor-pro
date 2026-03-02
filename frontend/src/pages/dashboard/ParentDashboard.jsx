@@ -98,7 +98,7 @@ export default function ParentDashboard() {
 
         <div className="mt-12 flex justify-center">
           <button className="bg-[#5B4FE9] text-white font-bold py-4 px-10 rounded-2xl shadow-lg hover:scale-105 transition transform duration-200">
-            Download PDF Report
+            Send Weekly Report to Email
           </button>
         </div>
       </div>
