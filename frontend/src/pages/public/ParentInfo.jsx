@@ -1,78 +1,32 @@
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { Mail, ShieldCheck, Users } from 'lucide-react';
 
 export default function ParentInfo() {
-  useEffect(() => { document.title = "For Parents - AI Tutor Pro"; }, []);
-
   return (
-    <div className="bg-[#F8F9FA] font-sans pb-24 overflow-hidden">
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
-          <div className="flex-1 text-center lg:text-left z-10">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight mb-6 leading-tight">
-              Stay in the loop, <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">without hovering.</span>
-            </h1>
-            <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0">
-              Get weekly insights, monitor emotional well-being, and collaborate with real tutors—all from one beautiful dashboard.
-            </p>
-            <Link to="/register" className="inline-block bg-[#1E1B4B] text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:bg-indigo-900 transition text-lg">
-              Start 14-Day Free Trial
-            </Link>
+    <div className="min-h-screen bg-[#F4F6FA] py-20 px-6">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-4xl font-black text-slate-900 mb-12 text-center">Built for Busy Parents in Oakville and Beyond.</h2>
+        
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="bg-white p-8 rounded-[32px] shadow-sm">
+            <Mail className="text-[#4338CA] mb-4" size={32} />
+            <h4 className="font-bold text-xl mb-2">Smart HTML Reports</h4>
+            <p className="text-sm text-slate-500 leading-relaxed">No more PDF attachments. Receive beautiful, mobile-friendly HTML reports directly in your inbox to see Alexandre's progress instantly.</p>
           </div>
-          <div className="flex-1 w-full z-10">
-            <div className="aspect-video rounded-3xl border-8 border-white shadow-2xl overflow-hidden">
-               <img src="/images/parent-hero-hug.jpg" alt="Parent and child" className="w-full h-full object-cover" onError={(e) => e.target.src = 'https://placehold.co/1200x675?text=parent-hero-hug.jpg'} />
-            </div>
+          
+          <div className="bg-white p-8 rounded-[32px] shadow-sm">
+            <Users className="text-[#4338CA] mb-4" size={32} />
+            <h4 className="font-bold text-xl mb-2">Tutor Handshake</h4>
+            <p className="text-sm text-slate-500 leading-relaxed">Easily link your child to a professional tutor. Your tutor can monitor scores and provide personalized guidance through the platform.</p>
           </div>
-        </div>
-      </section>
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-32">
-        <div className="flex flex-col md:flex-row items-center gap-12">
-          <div className="flex-1 order-2 md:order-1 w-full">
-            <div className="aspect-square md:aspect-video rounded-3xl shadow-xl overflow-hidden border border-slate-200">
-              <img src="/images/weekly-report-phone.jpg" alt="Weekly progress report" className="w-full h-full object-cover" onError={(e) => e.target.src = 'https://placehold.co/800x600?text=weekly-report-phone.jpg'} />
-            </div>
-          </div>
-          <div className="flex-1 order-1 md:order-2">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Detailed Weekly Reports</h2>
-            <p className="text-lg text-slate-600 leading-relaxed">Every Friday afternoon, receive a beautifully formatted PDF directly to your inbox. Track exactly which concepts they mastered, where they struggled, and how their confidence is growing.</p>
+          <div className="bg-white p-8 rounded-[32px] shadow-sm">
+            <ShieldCheck className="text-[#4338CA] mb-4" size={32} />
+            <h4 className="font-bold text-xl mb-2">Safe & Secure</h4>
+            <p className="text-sm text-slate-500 leading-relaxed">Parent-controlled accounts mean you handle the billing and student access. Your data is protected and never sold.</p>
           </div>
         </div>
-
-        <div className="flex flex-col md:flex-row items-center gap-12">
-          <div className="flex-1">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Total Peace of Mind</h2>
-            <p className="text-lg text-slate-600 leading-relaxed">Stop fighting over homework. AI Tutor Pro uses empathetic, encouraging language that never makes a child feel "wrong." You get to relax on the couch knowing the learning is actually happening.</p>
-          </div>
-          <div className="flex-1 w-full">
-            <div className="aspect-square md:aspect-video rounded-3xl shadow-xl overflow-hidden border border-slate-200">
-              <img src="/images/relaxed-dad-couch.jpg" alt="Relaxed parent" className="w-full h-full object-cover" onError={(e) => e.target.src = 'https://placehold.co/800x600?text=relaxed-dad-couch.jpg'} />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col md:flex-row items-center gap-12">
-          <div className="flex-1 order-2 md:order-1 w-full">
-            <div className="aspect-square md:aspect-video rounded-3xl shadow-xl overflow-hidden border border-slate-200">
-              <img src="/images/tutor-collaboration.jpg" alt="Tutor collaboration" className="w-full h-full object-cover" onError={(e) => e.target.src = 'https://placehold.co/800x600?text=tutor-collaboration.jpg'} />
-            </div>
-          </div>
-          <div className="flex-1 order-1 md:order-2">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Real Tutor Collaboration</h2>
-            <p className="text-lg text-slate-600 leading-relaxed">Already have a human tutor? Perfect. Invite them to your child's dashboard with one click. They can view progress, leave private notes, and use Gemini AI to generate custom curriculum targeted at your child's exact weaknesses.</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-white border-y border-slate-200 py-16 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h3 className="text-2xl font-bold text-slate-900 mb-10">Trusted by families everywhere</h3>
-          <div className="w-full max-w-4xl mx-auto h-64 rounded-3xl shadow-md overflow-hidden border border-slate-200">
-             <img src="/images/parents-trust-collage.jpg" alt="Parents trusting AI Tutor" className="w-full h-full object-cover" onError={(e) => e.target.src = 'https://placehold.co/1000x400?text=parents-trust-collage.jpg'} />
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }
