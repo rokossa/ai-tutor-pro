@@ -1,7 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-// Hardcoding the English translations so you never see technical keys again!
 const resources = {
   en: {
     translation: {
@@ -16,19 +15,17 @@ const resources = {
       },
       errors: {
         "404Headline": "Oops! Page Not Found",
-        "404Body": "The learning module or page you are looking for has been moved or doesn't exist."
+        "404Body": "The page you are looking for doesn't exist."
       }
     }
   }
 };
 
-i18n
-  .use(initReactI18next)
-  .init({
-    resources,
-    lng: "en", 
-    fallbackLng: "en",
-    interpolation: { escapeValue: false }
-  });
+i18n.use(initReactI18next).init({
+  resources,
+  lng: "en", 
+  fallbackLng: "en",
+  interpolation: { escapeValue: false }
+});
 
 export default i18n;
