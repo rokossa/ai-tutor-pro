@@ -6,7 +6,6 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const [activeGrade, setActiveGrade] = useState('Grade 8');
 
-  // Interactive Curriculum Data to showcase "The What" immediately
   const previewCurriculum = {
     'Grade 6': { math: ['Fractions & Decimals', 'Data Management', 'Basic Geometry', 'Ratios'], science: ['Biodiversity', 'Flight', 'Electricity', 'Space'] },
     'Grade 7': { math: ['Integers', 'Algebraic Expressions', 'Area & Perimeter', 'Probability'], science: ['Ecosystems', 'Pure Substances', 'Heat', 'Structures'] },
@@ -19,8 +18,6 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white font-sans">
-      
-      {/* Hero Section */}
       <div className="bg-[#F8F9FA] pt-24 pb-16 px-6 border-b border-slate-200">
         <div className="max-w-6xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 text-[#4338CA] font-bold text-sm mb-6 border border-indigo-100">
@@ -43,15 +40,12 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* The "What": Curriculum Explorer */}
       <div className="py-24 px-6 max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-black text-slate-900 mb-4">Everything your child needs to know.</h2>
           <p className="text-lg text-slate-500">Select a grade to preview our curriculum-aligned practice modules.</p>
         </div>
-
         <div className="bg-white border border-slate-200 rounded-[32px] shadow-sm overflow-hidden flex flex-col md:flex-row">
-          {/* Grade Selector */}
           <div className="md:w-1/3 bg-slate-50 p-6 border-r border-slate-200 flex flex-col gap-2 h-96 overflow-y-auto">
             {Object.keys(previewCurriculum).map(grade => (
               <button 
@@ -64,8 +58,6 @@ export default function LandingPage() {
               </button>
             ))}
           </div>
-          
-          {/* Content Display */}
           <div className="p-8 md:p-12 flex-1">
             <h3 className="text-2xl font-black text-slate-900 mb-8 pb-4 border-b border-slate-100">{activeGrade} Topics</h3>
             <div className="grid sm:grid-cols-2 gap-8">
@@ -94,27 +86,23 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* The "Why": The Didakt Difference */}
       <div className="bg-[#F8F9FA] py-24 px-6 border-t border-slate-200">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-black text-slate-900 mb-4">How Didakt actually works.</h2>
             <p className="text-lg text-slate-500">We don't just grade tests. We guide the learning process.</p>
           </div>
-
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-100 relative">
               <div className="w-12 h-12 bg-indigo-50 text-[#4338CA] rounded-2xl flex items-center justify-center font-black text-xl mb-6">1</div>
               <h4 className="text-xl font-bold text-slate-900 mb-3">Adaptive Practice</h4>
               <p className="text-slate-600 leading-relaxed">Students enter the Practice Arena where problems adjust in real-time to their skill level, ensuring they stay appropriately challenged.</p>
             </div>
-            
             <div className="bg-white p-8 rounded-[32px] shadow-sm border border-[#4338CA] relative ring-4 ring-indigo-50">
               <div className="w-12 h-12 bg-[#4338CA] text-white rounded-2xl flex items-center justify-center font-black text-xl mb-6">2</div>
               <h4 className="text-xl font-bold text-slate-900 mb-3">Socratic AI Hinting</h4>
               <p className="text-slate-600 leading-relaxed">When a student gets stuck, our AI acts as a patient tutor. It asks leading questions to help them discover the next step entirely on their own.</p>
             </div>
-
             <div className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-100 relative">
               <div className="w-12 h-12 bg-teal-50 text-[#14b8a6] rounded-2xl flex items-center justify-center font-black text-xl mb-6">3</div>
               <h4 className="text-xl font-bold text-slate-900 mb-3">Parent Insights</h4>
