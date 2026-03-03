@@ -6,7 +6,6 @@ import GlobalFooter from './components/GlobalFooter';
 
 import './i18n'; 
 
-// 1. ALL IMPORTS RESTORED (No shorthand)
 const LandingPage = React.lazy(() => import('./pages/LandingPage'));
 const ParentSignup = React.lazy(() => import('./pages/ParentSignup'));
 const AuthSuccess = React.lazy(() => import('./pages/AuthSuccess'));
@@ -20,7 +19,6 @@ const PracticeArena = React.lazy(() => import('./pages/PracticeArena'));
 const PracticeSummary = React.lazy(() => import('./pages/PracticeSummary'));
 const NotFound = React.lazy(() => import('./pages/errors/NotFound'));
 
-// Public Pages
 const About = React.lazy(() => import('./pages/public/About'));
 const Contact = React.lazy(() => import('./pages/public/Contact'));
 const CurriculumInfo = React.lazy(() => import('./pages/public/CurriculumInfo'));
@@ -36,8 +34,8 @@ function App() {
   const [showWarning, setShowWarning] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(60);
   
-  const INACTIVITY_LIMIT = 10 * 60 * 1000; // 10 Minutes
-  const WARNING_THRESHOLD = 9 * 60 * 1000; // 9 Minutes (Start warning at 1 min left)
+  const INACTIVITY_LIMIT = 10 * 60 * 1000; 
+  const WARNING_THRESHOLD = 9 * 60 * 1000; 
 
   const handleReset = useCallback(() => {
     setLastActivity(Date.now());
@@ -77,7 +75,6 @@ function App() {
       <div className="flex flex-col min-h-screen bg-[#F8F9FA]">
         <GlobalNavbar />
         
-        {/* Session Warning Modal */}
         {showWarning && (
           <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
             <div className="bg-white rounded-[32px] p-10 max-w-sm w-full shadow-2xl text-center border border-white">
@@ -101,10 +98,7 @@ function App() {
         <main className="flex-grow flex flex-col">
           <Suspense fallback={<div className="flex-grow flex items-center justify-center"><div className="w-10 h-10 border-4 border-[#4338CA] border-t-transparent rounded-full animate-spin"></div></div>}>
             <Routes>
-              {/* Home is now our Storefront */}
               <Route path="/" element={<LandingPage />} />
-              
-              {/* Restored Public Pages */}
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/curriculum" element={<CurriculumInfo />} />
@@ -115,13 +109,11 @@ function App() {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
 
-              {/* Auth Routes */}
               <Route path="/login" element={<ParentSignup />} />
               <Route path="/register" element={<ParentSignup />} />
               <Route path="/auth-success" element={<AuthSuccess />} />
               <Route path="/magic-login" element={<MagicLogin />} />
               
-              {/* Dashboard & Practice */}
               <Route path="/onboarding/*" element={<OnboardingFlow />} />
               <Route path="/parent/dashboard" element={<ParentDashboard />} />
               <Route path="/student/dashboard" element={<StudentDashboard />} />
@@ -141,4 +133,3 @@ function App() {
 }
 
 export default App;
-??
