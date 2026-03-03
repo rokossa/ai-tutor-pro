@@ -82,7 +82,7 @@ function App() {
         <main className="flex-grow flex flex-col">
           <Suspense fallback={<div className="flex-grow flex items-center justify-center animate-pulse">Loading Didakt...</div>}>
             <Routes>
-              <Route path="/" element={<About />} />
+              <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<ParentSignup />} />
               <Route path="/parent/dashboard" element={<ParentDashboard />} />
               {/* ... other routes ... */}
