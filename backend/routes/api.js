@@ -1,13 +1,36 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../db'); // Import our new PostgreSQL pool
 
-// Health Check
-router.get('/health', (req, res) => res.status(200).json({ status: 'ok', message: 'AI Tutor Pro API is live.' }));
+// Import Controllers
+const evaluationController = require('../controllers/evaluationController');
+const exerciseController = require('../controllers/exerciseController');
 
-// Core Routes
-router.use('/auth', require('./auth'));       // <-- This is the route returning the 404!
-router.use('/family', require('./family'));
-router.use('/ai', require('./ai'));
-router.use('/stripe', require('./stripe'));
+// 🧮 Math Evaluation Engine (SymPy)
+router.post('/evaluate', evaluationController.checkAnswer);
+
+// 🧠 Adaptive Exercise Generator (Gemini)
+router.post('/exercise', exerciseController.getAdaptiveProblem);
+
+// 🔌 Database Connection Health Check
+router.get('/test-db', async (req, res) => {
+  try {
+    // Run a lightweight query to verify the connection is active
+    const result = await db.query('SELECT NOW() as current_time, current_database() as db_name');
+    
+    res.json({ 
+      success: true, 
+      message: 'Knowledge Graph Database connection successful!', 
+      data: result.rows[0] 
+    });
+  } catch (error) {
+    console.error('🔥 Database connection failed:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Database connection failed. Check your DATABASE_URL environment variable.', 
+      error: error.message 
+    });
+  }
+});
 
 module.exports = router;
