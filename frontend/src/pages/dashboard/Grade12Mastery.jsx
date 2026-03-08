@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Network, Target, AlertCircle, CheckCircle2, Lock } from 'lucide-react';
+import { Network, Target, AlertCircle, CheckCircle2, Lock, Database, ServerCrash } from 'lucide-react';
 
 export default function Grade12Mastery() {
   const [activeSubject, setActiveSubject] = useState('Mathematics');
+  const [dbStatus, setDbStatus] = useState('idle'); // idle, loading, connected, error
+  const [dbMessage, setDbMessage] = useState('');
   
   // Mocking the backend Graph response for Grade 12 Calculus
   const graphData = [
@@ -14,16 +16,60 @@ export default function Grade12Mastery() {
     { id: 'optimization', name: 'Optimization', status: 'unknown', score: 0.0, isUnlocked: false }
   ];
 
+  const testDatabaseConnection = async () => {
+    setDbStatus('loading');
+    try {
+      // This calls the backend API route we built earlier
+      const response = await fetch('/api/test-db');
+      const data = await response.json();
+      
+      if (data.success) {
+        setDbStatus('connected');
+        setDbMessage(`Connected: ${data.data.db_name}`);
+      } else {
+        setDbStatus('error');
+        setDbMessage('Connection failed.');
+      }
+    } catch (error) {
+      setDbStatus('error');
+      setDbMessage('Backend unreachable.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F8F9FA] p-8 font-sans">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
           <div>
             <h1 className="text-4xl font-black text-slate-900 tracking-tight">Grade 12 Mastery</h1>
             <p className="text-slate-500 font-medium mt-2">Knowledge Graph & Dependency Engine</p>
           </div>
-          <div className="bg-indigo-50 text-[#4338CA] px-6 py-3 rounded-2xl font-bold flex items-center gap-2 border border-indigo-100">
-            <Network size={20} /> Adaptive Mode Active
+          
+          <div className="flex gap-4">
+            {/* New Database Health Check Widget */}
+            <button 
+              onClick={testDatabaseConnection}
+              className={`px-6 py-3 rounded-2xl font-bold flex items-center gap-2 border transition-all ${
+                dbStatus === 'connected' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                dbStatus === 'error' ? 'bg-rose-50 text-rose-600 border-rose-200' :
+                'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+              }`}
+            >
+              {dbStatus === 'loading' ? (
+                <div className="w-5 h-5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></div>
+              ) : dbStatus === 'connected' ? (
+                <Database size={20} />
+              ) : dbStatus === 'error' ? (
+                <ServerCrash size={20} />
+              ) : (
+                <Database size={20} />
+              )}
+              {dbStatus === 'idle' ? 'Test DB Connection' : dbMessage}
+            </button>
+
+            <div className="bg-indigo-50 text-[#4338CA] px-6 py-3 rounded-2xl font-bold flex items-center gap-2 border border-indigo-100">
+              <Network size={20} /> Adaptive Mode Active
+            </div>
           </div>
         </div>
 
