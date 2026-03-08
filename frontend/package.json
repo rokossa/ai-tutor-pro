@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "pip3 install sympy antlr4-python3-runtime==4.11.1 && vite build",
+    "build": "pip3 install sympy antlr4-python3-runtime==4.11.1 --break-system-packages && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
