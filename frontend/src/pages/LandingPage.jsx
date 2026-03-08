@@ -28,7 +28,7 @@ export default function LandingPage() {
       french: ['Imperfect Tense', 'Complex Sentences', 'Written Expression', 'Media in French'],
       geography: ['Global Settlement', 'Economic Development', 'Migration', 'Quality of Life']
     },
-    'Grade 9': { 
+    'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12': { 
       math: ['Polynomials', 'Linear Relations', 'Analytic Geometry', 'Trigonometry'], 
       science: ['Chemistry', 'Ecology', 'Physics', 'Space Exploration'],
       english: ['Novel Study', 'Shakespeare Intro', 'Expository Writing', 'Critical Analysis'],
