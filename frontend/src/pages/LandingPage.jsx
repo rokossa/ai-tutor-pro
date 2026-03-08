@@ -28,7 +28,7 @@ export default function LandingPage() {
       french: ['Imperfect Tense', 'Complex Sentences', 'Written Expression', 'Media in French'],
       geography: ['Global Settlement', 'Economic Development', 'Migration', 'Quality of Life']
     },
-    'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12': { 
+    'Grade 9': { 
       math: ['Polynomials', 'Linear Relations', 'Analytic Geometry', 'Trigonometry'], 
       science: ['Chemistry', 'Ecology', 'Physics', 'Space Exploration'],
       english: ['Novel Study', 'Shakespeare Intro', 'Expository Writing', 'Critical Analysis'],
@@ -45,7 +45,7 @@ export default function LandingPage() {
     'Grade 11': { 
       math: ['Functions', 'Financial Math', 'Exponential Data', 'Trig Identities'], 
       science: ['Kinematics', 'Dynamics', 'Cellular Biology', 'Chemical Bonding'],
-      english: ['American/British Lit', 'Creative Writing', 'Rhetorical Analysis', 'Research Papers'],
+          english: ['American/British Lit', 'Creative Writing', 'Rhetorical Analysis', 'Research Papers'],
       french: ['Advanced Grammar', 'Literature Analysis', 'Spoken Fluency', 'Current Events'],
       geography: ['Physical Geography', 'Human Geography', 'Global Conflicts', 'Sustainable Dev.']
     },
@@ -104,7 +104,6 @@ export default function LandingPage() {
             <h3 className="text-2xl font-black text-slate-900 mb-8 pb-4 border-b border-slate-100">{activeGrade} Topics</h3>
             
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* Math */}
               <div>
                 <h4 className="font-bold text-[#4338CA] mb-4 flex items-center gap-2"><Calculator size={18}/> Mathematics</h4>
                 <ul className="space-y-3">
@@ -116,7 +115,6 @@ export default function LandingPage() {
                 </ul>
               </div>
               
-              {/* Science */}
               <div>
                 <h4 className="font-bold text-[#14b8a6] mb-4 flex items-center gap-2"><FlaskConical size={18}/> Sciences</h4>
                 <ul className="space-y-3">
@@ -128,7 +126,6 @@ export default function LandingPage() {
                 </ul>
               </div>
 
-              {/* English */}
               <div>
                 <h4 className="font-bold text-amber-500 mb-4 flex items-center gap-2"><BookOpen size={18}/> English</h4>
                 <ul className="space-y-3">
@@ -140,7 +137,6 @@ export default function LandingPage() {
                 </ul>
               </div>
 
-              {/* French */}
               <div>
                 <h4 className="font-bold text-rose-500 mb-4 flex items-center gap-2"><MessageCircle size={18}/> French</h4>
                 <ul className="space-y-3">
@@ -152,7 +148,6 @@ export default function LandingPage() {
                 </ul>
               </div>
 
-              {/* Geography */}
               <div>
                 <h4 className="font-bold text-emerald-600 mb-4 flex items-center gap-2"><Map size={18}/> Geography</h4>
                 <ul className="space-y-3">
