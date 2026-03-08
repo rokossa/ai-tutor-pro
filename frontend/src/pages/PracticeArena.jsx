@@ -1,145 +1,164 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Send, Sparkles, ChevronLeft, Loader2, User } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Lightbulb, CheckCircle2, XCircle, ArrowRight, BrainCircuit } from 'lucide-react';
+import 'katex/dist/katex.min.css';
+import Latex from 'react-latex-next';
 
 export default function PracticeArena() {
-  const { course, chapter } = useParams();
-  const navigate = useNavigate();
+  const [exercise, setExercise] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [problemData, setProblemData] = useState(null);
-  const [answer, setAnswer] = useState('');
-  const [chat, setChat] = useState([]);
-  const [userInput, setUserInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const chatEndRef = useRef(null);
+  const [studentAnswer, setStudentAnswer] = useState('');
+  const [status, setStatus] = useState('idle'); // idle, correct, incorrect
+  const [visibleHints, setVisibleHints] = useState(0);
 
-  // 1. Fetch the AI-generated problem on load
+  // Fetch the dynamically generated exercise from our new backend service
   useEffect(() => {
-    const fetchProblem = async () => {
-      try {
-        const res = await fetch('/api/ai/generate', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('ai_tutor_token')}`
-          },
-          body: JSON.stringify({ subject: course, grade: 'Grade 8', topic: course, chapter: chapter })
+    fetchExercise();
+  }, []);
+
+  const fetchExercise = async () => {
+    setLoading(true);
+    setStatus('idle');
+    setStudentAnswer('');
+    setVisibleHints(0);
+    
+    try {
+      // In production, this targets your /api/exercise endpoint
+      // Mocking the successful Gemini JSON response for UI testing
+      setTimeout(() => {
+        setExercise({
+          problem_statement: "Find the derivative of the function $f(x) = x^2 e^{-3x}$ with respect to $x$.",
+          correct_answer_latex: "2xe^{-3x} - 3x^2e^{-3x}",
+          hints: [
+            "Hint 1: This function is a product of two terms, $u(x) = x^2$ and $v(x) = e^{-3x}$. Which rule should you use?",
+            "Hint 2: The product rule states that $\\frac{d}{dx}[u(x)v(x)] = u'(x)v(x) + u(x)v'(x)$. Find $u'(x)$ and $v'(x)$.",
+            "Hint 3: Be careful with the chain rule when finding $v'(x)$. The derivative of $e^{-3x}$ is $-3e^{-3x}$."
+          ],
+          full_solution: "Applying the product rule:\n1. $u(x) = x^2 \\implies u'(x) = 2x$\n2. $v(x) = e^{-3x} \\implies v'(x) = -3e^{-3x}$\n3. $f'(x) = (2x)(e^{-3x}) + (x^2)(-3e^{-3x}) = 2xe^{-3x} - 3x^2e^{-3x}$"
         });
-        const data = await res.json();
-        setProblemData(data);
-        setChat([{ role: 'ai', message: data.initialHint }]);
         setLoading(false);
-      } catch (err) {
-        console.error("Failed to load problem:", err);
-      }
-    };
-    fetchProblem();
-  }, [course, chapter]);
-
-  const scrollToBottom = () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  useEffect(scrollToBottom, [chat]);
-
-  const handleChatSubmit = async (e) => {
-    e.preventDefault();
-    if (!userInput.trim()) return;
-
-    const newChat = [...chat, { role: 'user', message: userInput }];
-    setChat(newChat);
-    setUserInput('');
-    setIsTyping(true);
-
-    // In a real production app, this hits a /api/ai/chat endpoint
-    // For now, we simulate the Socratic response logic
-    setTimeout(() => {
-      setChat([...newChat, { 
-        role: 'ai', 
-        message: "That's a great question, Alexandre. Remember our goal is to keep the equation balanced. If we do something to one side, what must we do to the other?" 
-      }]);
-      setIsTyping(false);
-    }, 1500);
+      }, 1500);
+    } catch (err) {
+      console.error("Failed to fetch exercise");
+    }
   };
 
-  if (loading) return (
-    <div className="min-h-screen bg-[#Eef0f4] flex items-center justify-center">
-      <Loader2 className="animate-spin text-[#4338CA]" size={48} />
-    </div>
-  );
+  const checkAnswer = () => {
+    // Basic string comparison for the MVP. In production, this uses SymPy via the backend.
+    const normalizedStudent = studentAnswer.replace(/\s/g, '');
+    const normalizedCorrect = exercise.correct_answer_latex.replace(/\s/g, '');
+    
+    if (normalizedStudent === normalizedCorrect) {
+      setStatus('correct');
+    } else {
+      setStatus('incorrect');
+    }
+  };
+
+  const revealHint = () => {
+    if (visibleHints < exercise.hints.length) {
+      setVisibleHints(prev => prev + 1);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center font-sans">
+        <div className="w-16 h-16 border-4 border-[#4338CA] border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-slate-500 font-bold">Gemini is generating your personalized exercise...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[#Eef0f4] flex flex-col font-sans">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm">
-        <button onClick={() => navigate('/student/dashboard')} className="flex items-center gap-2 text-slate-500 font-bold hover:text-slate-800 transition">
-          <ChevronLeft size={20} /> Exit
-        </button>
-        <div className="text-xs font-black text-slate-400 uppercase tracking-widest">
-          {course} • {chapter}
+    <div className="min-h-screen bg-[#F8F9FA] p-4 md:p-8 font-sans">
+      <div className="max-w-3xl mx-auto">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-black text-slate-900">Calculus: Derivative Rules</h1>
+            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1">Skill ID: calc_product_rule</p>
+          </div>
+          <div className="bg-indigo-50 text-[#4338CA] px-4 py-2 rounded-xl font-bold flex items-center gap-2 text-sm border border-indigo-100">
+            <BrainCircuit size={16} /> Adaptive Mastery
+          </div>
         </div>
-        <div className="bg-[#14b8a6]/10 text-[#14b8a6] px-4 py-1.5 rounded-full font-black text-xs border border-[#14b8a6]/20">
-          7 DAY STREAK 🔥
-        </div>
-      </div>
 
-      <div className="flex-grow flex flex-col lg:flex-row p-4 sm:p-6 gap-6 overflow-hidden">
-        {/* Left: Socratic Chat Sidebar */}
-        <div className="lg:w-1/3 bg-white/80 backdrop-blur-md rounded-[32px] shadow-sm border border-white flex flex-col overflow-hidden">
-          <div className="p-6 border-b border-slate-100 flex items-center gap-3">
-            <div className="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-lg"><Sparkles size={20} /></div>
-            <h2 className="font-black text-slate-900">Step-by-Step Help</h2>
+        {/* The Problem Card */}
+        <div className="bg-white rounded-[32px] p-8 md:p-12 shadow-sm border border-slate-200 mb-6">
+          <h2 className="text-lg font-bold text-slate-500 mb-6">Solve the following:</h2>
+          <div className="text-2xl text-slate-900 mb-10 overflow-x-auto">
+            <Latex>{exercise.problem_statement}</Latex>
           </div>
 
-          <div className="flex-grow overflow-y-auto p-6 space-y-4">
-            {chat.map((msg, i) => (
-              <div key={i} className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'}`}>
-                <div className={`max-w-[85%] p-4 rounded-2xl text-sm font-medium shadow-sm ${
-                  msg.role === 'ai' ? 'bg-white text-slate-700 border border-slate-100' : 'bg-[#4338CA] text-white'
-                }`}>
-                  {msg.message}
-                </div>
-              </div>
-            ))}
-            {isTyping && <div className="text-slate-400 text-xs font-bold animate-pulse">AI is thinking...</div>}
-            <div ref={chatEndRef} />
-          </div>
-
-          <form onSubmit={handleChatSubmit} className="p-4 bg-slate-50 border-t border-slate-100">
-            <div className="relative">
+          {/* Input Area */}
+          <div className="space-y-4">
+            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest px-1">Your Answer</label>
+            <div className={`flex items-center border-2 rounded-2xl overflow-hidden transition ${status === 'correct' ? 'border-[#14b8a6] bg-teal-50' : status === 'incorrect' ? 'border-amber-500 bg-amber-50' : 'border-slate-200 bg-slate-50 focus-within:border-[#4338CA]'}`}>
+              <div className="px-6 py-4 font-serif italic text-slate-400 border-r border-slate-200">f'(x) =</div>
               <input 
                 type="text" 
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                placeholder="Ask for a hint..."
-                className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 pr-12 text-sm font-medium focus:border-[#4338CA] outline-none"
+                className="w-full bg-transparent py-4 px-6 font-mono text-lg outline-none text-slate-900"
+                placeholder="e.g., 2xe^{-3x} - 3x^2e^{-3x}"
+                value={studentAnswer}
+                onChange={(e) => { setStudentAnswer(e.target.value); setStatus('idle'); }}
+                disabled={status === 'correct'}
               />
-              <button type="submit" className="absolute right-2 top-2 bottom-2 text-[#4338CA] hover:scale-110 transition">
-                <Send size={18} />
+            </div>
+          </div>
+
+          {/* Socratic Hints Section */}
+          <div className="mt-8 space-y-4">
+            {exercise.hints.slice(0, visibleHints).map((hint, idx) => (
+              <div key={idx} className="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex gap-3 text-amber-900 animate-in slide-in-from-top-2">
+                <Lightbulb className="shrink-0 text-amber-500" size={20} />
+                <div className="text-sm font-medium"><Latex>{hint}</Latex></div>
+              </div>
+            ))}
+            
+            {visibleHints < exercise.hints.length && status !== 'correct' && (
+              <button 
+                onClick={revealHint}
+                className="text-sm font-bold text-[#4338CA] hover:text-indigo-800 transition flex items-center gap-1"
+              >
+                + Need a hint? ({exercise.hints.length - visibleHints} remaining)
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Action Footer */}
+        <div className="flex justify-between items-center">
+          {status === 'idle' || status === 'incorrect' ? (
+            <button 
+              onClick={checkAnswer}
+              disabled={!studentAnswer.trim()}
+              className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-lg hover:bg-slate-800 transition shadow-lg disabled:opacity-50 flex items-center gap-2 ml-auto"
+            >
+              Check Answer
+            </button>
+          ) : (
+            <div className="w-full flex items-center justify-between bg-[#14b8a6] text-white p-4 pl-6 rounded-2xl shadow-lg animate-in fade-in">
+              <div className="flex items-center gap-3 font-bold text-lg">
+                <CheckCircle2 size={24} /> Brilliant work!
+              </div>
+              <button 
+                onClick={fetchExercise}
+                className="bg-white text-[#14b8a6] px-6 py-2 rounded-xl font-black hover:bg-teal-50 transition flex items-center gap-2"
+              >
+                Next Challenge <ArrowRight size={18} />
               </button>
             </div>
-          </form>
+          )}
         </div>
 
-        {/* Right: Problem Workspace */}
-        <div className="flex-1 bg-white rounded-[40px] p-10 shadow-sm border border-slate-100 flex flex-col">
-          <div className="mb-12">
-            <h1 className="text-4xl font-black text-slate-900 mb-8">Current Exercise</h1>
-            <div className="bg-slate-50 rounded-3xl p-12 border border-slate-100 text-4xl font-mono text-center text-slate-800 shadow-inner">
-              {problemData.problem}
-            </div>
+        {/* Incorrect State Feedback */}
+        {status === 'incorrect' && (
+          <div className="mt-6 flex items-center justify-center gap-2 text-amber-600 font-bold animate-in zoom-in">
+            <XCircle size={20} /> Not quite right. Try using a hint!
           </div>
+        )}
 
-          <div className="mt-auto max-w-xl mx-auto w-full">
-            <input 
-              type="text" 
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              placeholder="Your final answer..."
-              className="w-full bg-[#F8F9FA] border-2 border-slate-200 rounded-[28px] py-6 px-8 text-2xl font-bold text-center mb-4 focus:border-[#4338CA] outline-none"
-            />
-            <button className="w-full bg-[#4338CA] text-white py-5 rounded-[28px] font-black text-xl shadow-lg hover:bg-indigo-700 transition">
-              Check Solution
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
