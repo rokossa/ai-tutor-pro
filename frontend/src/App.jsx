@@ -18,6 +18,7 @@ const Settings = React.lazy(() => import('./pages/dashboard/Settings'));
 const PracticeArena = React.lazy(() => import('./pages/PracticeArena'));
 const PracticeSummary = React.lazy(() => import('./pages/PracticeSummary'));
 const NotFound = React.lazy(() => import('./pages/errors/NotFound'));
+const Grade12Mastery = React.lazy(() => import('./pages/dashboard/Grade12Mastery'));
 
 const About = React.lazy(() => import('./pages/public/About'));
 const Contact = React.lazy(() => import('./pages/public/Contact'));
@@ -117,6 +118,7 @@ function App() {
               <Route path="/onboarding/*" element={<OnboardingFlow />} />
               <Route path="/parent/dashboard" element={<ParentDashboard />} />
               <Route path="/student/dashboard" element={<StudentDashboard />} />
+              <Route path="/student/mastery" element={<Grade12Mastery />} />
               <Route path="/tutor/dashboard" element={<TutorDashboard />} />
               <Route path="/parent/settings" element={<Settings />} />
               <Route path="/practice/:course/:chapter" element={<PracticeArena />} />
