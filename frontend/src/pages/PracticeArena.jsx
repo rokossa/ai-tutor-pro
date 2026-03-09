@@ -8,7 +8,7 @@ export default function PracticeArena() {
   const [exercise, setExercise] = useState(null);
   const [loading, setLoading] = useState(true);
   const [studentAnswer, setStudentAnswer] = useState('');
-  const [status, setStatus] = useState('idle'); // idle, correct, incorrect
+  const [status, setStatus] = useState('idle'); 
   const [visibleHints, setVisibleHints] = useState(0);
   const [showSolution, setShowSolution] = useState(false);
   const mathFieldRef = useRef(null);
@@ -17,17 +17,22 @@ export default function PracticeArena() {
     fetchExercise();
   }, []);
 
+  // 💡 THE FIX: Safely control the MathLive element via its JavaScript reference
   useEffect(() => {
     const mf = mathFieldRef.current;
     if (mf) {
+      // Set the readOnly property directly instead of using a buggy HTML attribute
+      mf.readOnly = (status === 'correct' || showSolution);
+
       const handleInput = () => {
         setStudentAnswer(mf.value);
         if (status !== 'correct') setStatus('idle');
       };
+      
       mf.addEventListener('input', handleInput);
       return () => mf.removeEventListener('input', handleInput);
     }
-  }, [loading, status]);
+  }, [loading, status, showSolution]);
 
   const fetchExercise = async () => {
     setLoading(true);
@@ -116,15 +121,16 @@ export default function PracticeArena() {
             <label className="block text-xs font-black text-slate-400 uppercase tracking-widest px-1">Your Answer</label>
             <div className={`flex items-center border-2 rounded-2xl overflow-hidden transition p-2 bg-white ${status === 'correct' ? 'border-[#14b8a6] bg-teal-50' : status === 'incorrect' ? 'border-amber-500 bg-amber-50' : 'border-slate-200 focus-within:border-[#4338CA]'}`}>
               <div className="px-4 py-4 font-serif italic text-slate-400 border-r border-slate-200">f'(x) =</div>
+              
+              {/* Removed the buggy HTML read-only attribute entirely! */}
               <math-field 
                 ref={mathFieldRef}
                 style={{ width: '100%', fontSize: '1.5rem', padding: '12px', backgroundColor: 'transparent', border: 'none', outline: 'none' }}
-                read-only={status === 'correct' || showSolution ? "true" : "false"}
               ></math-field>
+
             </div>
           </div>
 
-          {/* Solution Breakdown Block */}
           {showSolution && (
             <div className="mt-8 bg-slate-900 text-white p-8 rounded-3xl animate-in slide-in-from-top-4">
               <h3 className="text-lg font-black text-indigo-400 mb-4 flex items-center gap-2">
@@ -155,7 +161,6 @@ export default function PracticeArena() {
           </div>
         </div>
 
-        {/* Action Footer */}
         <div className="flex justify-between items-center mt-6">
           {status !== 'correct' && !showSolution ? (
             <div className="w-full flex justify-between items-center gap-4">
