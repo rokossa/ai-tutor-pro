@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Lightbulb, CheckCircle2, XCircle, ArrowRight, BrainCircuit } from 'lucide-react';
+import { Lightbulb, CheckCircle2, XCircle, ArrowRight, BrainCircuit, Eye } from 'lucide-react';
 import 'katex/dist/katex.min.css';
 import Latex from 'react-latex-next';
 import 'mathlive';
@@ -10,33 +10,33 @@ export default function PracticeArena() {
   const [studentAnswer, setStudentAnswer] = useState('');
   const [status, setStatus] = useState('idle'); // idle, correct, incorrect
   const [visibleHints, setVisibleHints] = useState(0);
+  const [showSolution, setShowSolution] = useState(false);
   const mathFieldRef = useRef(null);
 
   useEffect(() => {
     fetchExercise();
   }, []);
 
-  // Wire up the MathLive event listener safely in React
   useEffect(() => {
     const mf = mathFieldRef.current;
     if (mf) {
       const handleInput = () => {
-        setStudentAnswer(mf.value); // Extracts the clean LaTeX string!
-        setStatus('idle');
+        setStudentAnswer(mf.value);
+        if (status !== 'correct') setStatus('idle');
       };
       mf.addEventListener('input', handleInput);
       return () => mf.removeEventListener('input', handleInput);
     }
-  }, [loading]);
+  }, [loading, status]);
 
   const fetchExercise = async () => {
     setLoading(true);
     setStatus('idle');
     setStudentAnswer('');
     setVisibleHints(0);
+    setShowSolution(false);
     
     try {
-      // In production, this targets your /api/exercise endpoint
       setTimeout(() => {
         setExercise({
           problem_statement: "Find the derivative of the function $f(x) = x^2 e^{-3x}$ with respect to $x$.",
@@ -46,7 +46,7 @@ export default function PracticeArena() {
             "Hint 2: The product rule states that $\\frac{d}{dx}[u(x)v(x)] = u'(x)v(x) + u(x)v'(x)$. Find $u'(x)$ and $v'(x)$.",
             "Hint 3: Be careful with the chain rule when finding $v'(x)$. The derivative of $e^{-3x}$ is $-3e^{-3x}$."
           ],
-          full_solution: "Applying the product rule:\n1. $u(x) = x^2 \\implies u'(x) = 2x$\n2. $v(x) = e^{-3x} \\implies v'(x) = -3e^{-3x}$\n3. $f'(x) = (2x)(e^{-3x}) + (x^2)(-3e^{-3x}) = 2xe^{-3x} - 3x^2e^{-3x}$"
+          full_solution: "Applying the product rule:\n\n1. Let $u(x) = x^2 \\implies u'(x) = 2x$\n2. Let $v(x) = e^{-3x} \\implies v'(x) = -3e^{-3x}$\n3. $f'(x) = u'(x)v(x) + u(x)v'(x)$\n4. $f'(x) = (2x)(e^{-3x}) + (x^2)(-3e^{-3x})$\n5. $f'(x) = 2xe^{-3x} - 3x^2e^{-3x}$"
         });
         setLoading(false);
       }, 1000);
@@ -116,23 +116,25 @@ export default function PracticeArena() {
             <label className="block text-xs font-black text-slate-400 uppercase tracking-widest px-1">Your Answer</label>
             <div className={`flex items-center border-2 rounded-2xl overflow-hidden transition p-2 bg-white ${status === 'correct' ? 'border-[#14b8a6] bg-teal-50' : status === 'incorrect' ? 'border-amber-500 bg-amber-50' : 'border-slate-200 focus-within:border-[#4338CA]'}`}>
               <div className="px-4 py-4 font-serif italic text-slate-400 border-r border-slate-200">f'(x) =</div>
-              
-              {/* The New MathLive Editor Component */}
               <math-field 
                 ref={mathFieldRef}
-                style={{
-                  width: '100%',
-                  fontSize: '1.5rem',
-                  padding: '12px',
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  outline: 'none'
-                }}
+                style={{ width: '100%', fontSize: '1.5rem', padding: '12px', backgroundColor: 'transparent', border: 'none', outline: 'none' }}
+                read-only={status === 'correct' || showSolution ? "true" : "false"}
               ></math-field>
-              
             </div>
-            <p className="text-xs text-slate-400 ml-2">Click inside the box to open the virtual math keyboard.</p>
           </div>
+
+          {/* Solution Breakdown Block */}
+          {showSolution && (
+            <div className="mt-8 bg-slate-900 text-white p-8 rounded-3xl animate-in slide-in-from-top-4">
+              <h3 className="text-lg font-black text-indigo-400 mb-4 flex items-center gap-2">
+                <BrainCircuit size={20} /> Step-by-Step Solution
+              </h3>
+              <div className="prose prose-invert max-w-none text-lg leading-relaxed whitespace-pre-line">
+                <Latex>{exercise.full_solution}</Latex>
+              </div>
+            </div>
+          )}
 
           <div className="mt-8 space-y-4">
             {exercise.hints.slice(0, visibleHints).map((hint, idx) => (
@@ -142,7 +144,7 @@ export default function PracticeArena() {
               </div>
             ))}
             
-            {visibleHints < exercise.hints.length && status !== 'correct' && (
+            {visibleHints < exercise.hints.length && status !== 'correct' && !showSolution && (
               <button 
                 onClick={revealHint}
                 className="text-sm font-bold text-[#4338CA] hover:text-indigo-800 transition flex items-center gap-1"
@@ -153,23 +155,33 @@ export default function PracticeArena() {
           </div>
         </div>
 
-        <div className="flex justify-between items-center">
-          {status === 'idle' || status === 'incorrect' ? (
-            <button 
-              onClick={checkAnswer}
-              disabled={!studentAnswer.trim()}
-              className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-lg hover:bg-slate-800 transition shadow-lg disabled:opacity-50 flex items-center gap-2 ml-auto"
-            >
-              Check Answer
-            </button>
+        {/* Action Footer */}
+        <div className="flex justify-between items-center mt-6">
+          {status !== 'correct' && !showSolution ? (
+            <div className="w-full flex justify-between items-center gap-4">
+              <button 
+                onClick={() => setShowSolution(true)}
+                className="text-slate-500 hover:text-slate-800 font-bold flex items-center gap-2 transition px-4 py-2 rounded-xl hover:bg-slate-100"
+              >
+                <Eye size={18} /> Show Solution
+              </button>
+              
+              <button 
+                onClick={checkAnswer}
+                disabled={!studentAnswer.trim()}
+                className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-lg hover:bg-slate-800 transition shadow-lg disabled:opacity-50"
+              >
+                Check Answer
+              </button>
+            </div>
           ) : (
-            <div className="w-full flex items-center justify-between bg-[#14b8a6] text-white p-4 pl-6 rounded-2xl shadow-lg animate-in fade-in">
+            <div className={`w-full flex items-center justify-between p-4 pl-6 rounded-2xl shadow-lg animate-in fade-in ${status === 'correct' ? 'bg-[#14b8a6] text-white' : 'bg-slate-800 text-white'}`}>
               <div className="flex items-center gap-3 font-bold text-lg">
-                <CheckCircle2 size={24} /> Brilliant work!
+                {status === 'correct' ? <><CheckCircle2 size={24} /> Brilliant work!</> : <><Eye size={24} /> Review the solution carefully.</>}
               </div>
               <button 
                 onClick={fetchExercise}
-                className="bg-white text-[#14b8a6] px-6 py-2 rounded-xl font-black hover:bg-teal-50 transition flex items-center gap-2"
+                className={`px-6 py-2 rounded-xl font-black transition flex items-center gap-2 ${status === 'correct' ? 'bg-white text-[#14b8a6] hover:bg-teal-50' : 'bg-[#4338CA] text-white hover:bg-indigo-600'}`}
               >
                 Next Challenge <ArrowRight size={18} />
               </button>
@@ -177,9 +189,9 @@ export default function PracticeArena() {
           )}
         </div>
 
-        {status === 'incorrect' && (
+        {status === 'incorrect' && !showSolution && (
           <div className="mt-6 flex items-center justify-center gap-2 text-amber-600 font-bold animate-in zoom-in">
-            <XCircle size={20} /> Not quite right. Try using a hint!
+            <XCircle size={20} /> Not quite right. Try a hint or view the solution!
           </div>
         )}
 
