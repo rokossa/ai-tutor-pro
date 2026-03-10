@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "python3 -m venv ../backend/venv && ../backend/venv/bin/pip install sympy antlr4-python3-runtime==4.11.1 && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
