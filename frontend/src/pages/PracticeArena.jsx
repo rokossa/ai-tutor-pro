@@ -63,7 +63,7 @@ export default function PracticeArena() {
 
   const checkAnswer = async () => {
     try {
-      const response = await fetch("/api/evaluate", { 
+      const response = await fetch("https://ai-tutor-pro-backend.onrender.com/api/evaluate", { 
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
         body: JSON.stringify({ student_answer: studentAnswer, correct_answer: exercise.correct_answer_latex }) 
