@@ -46,7 +46,7 @@ export default function PracticeArena() {
       setTimeout(() => {
         setExercise({
           problem_statement: "Find the derivative of the function $f(x) = x^2 e^{-3x}$ with respect to $x$.",
-          correct_answer_latex: "2xe^{-3x} - 3x^2e^{-3x}",
+          correct_answer_latex: "2xe^{-3x}-3x^2e^{-3x}", // Normalized base format
           hints: [
             "Hint 1: This function is a product of two terms.",
             "Hint 2: The product rule states that $\\frac{d}{dx}[u(x)v(x)] = u'(x)v(x) + u(x)v'(x)$.",
@@ -69,12 +69,12 @@ export default function PracticeArena() {
         body: JSON.stringify({ student_answer: studentAnswer, correct_answer: exercise.correct_answer_latex }) 
       });
       
-      // 💡 THE FIX: Grab the raw text first so we don't crash on an empty response
       const rawText = await response.text();
       
       if (!rawText) {
          setStatus('incorrect');
-         setDebugMsg("CRITICAL: Server returned a blank 0-byte response. The Node backend likely suffered an Out-Of-Memory (OOM) crash when loading Python.");
+         // THE FIX: An accurate, non-Python generic crash message
+         setDebugMsg("CRITICAL: Server returned a blank response. The Node backend crashed internally (likely an import/module error). Check Render Logs.");
          return;
       }
 
@@ -93,7 +93,7 @@ export default function PracticeArena() {
       } else {
         setStatus('incorrect');
         if (data.error) setDebugMsg(`Engine Error: ${data.error}`);
-        else if (data.debug) setDebugMsg(`Debug: Python read your answer as: ${data.debug}`);
+        else if (data.debug) setDebugMsg(`Debug Info: ${data.debug}`);
       }
     } catch (error) {
       setStatus('incorrect');

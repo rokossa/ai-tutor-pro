@@ -1,36 +1,45 @@
-// We are keeping the class name "SympyService" so we don't have to rewrite your Controllers,
-// but under the hood, this is now a 100% pure JavaScript evaluation engine!
-const { ComputeEngine } = require('@cortex-js/compute-engine');
-
 class SympyService {
   static evaluateMath(studentAnswer, correctAnswer) {
     return new Promise((resolve) => {
       try {
-        console.log("🚀 Booting lightweight JS Compute Engine...");
+        console.log("🚀 Running Native JS Zero-Dependency Evaluator...");
         
-        // Initialize the engine
-        const ce = new ComputeEngine();
-        
-        // Parse the raw LaTeX from MathLive into MathJSON expressions
-        // CortexJS perfectly understands MathLive's output without needing a custom sanitizer!
-        const studentExpr = ce.parse(studentAnswer);
-        const correctExpr = ce.parse(correctAnswer);
+        // 1. A robust normalizer that strips out all MathLive formatting quirks
+        const normalize = (str) => {
+          if (!str) return "";
+          return str
+            .replace(/\s+/g, '')                  // Remove spaces
+            .replace(/\\cdot/g, '*')              // Convert LaTeX multiplication
+            .replace(/\\times/g, '*')             
+            .replace(/\\exponentialE/g, 'e')      // Convert MathLive 'e' variables
+            .replace(/\\mathrm\{e\}/g, 'e')
+            .replace(/\\mathit\{e\}/g, 'e')
+            .replace(/\\left/g, '')               // Remove dynamic sizing brackets
+            .replace(/\\right/g, '')
+            .replace(/\\,/g, '')                  // Remove LaTeX spacing
+            .replace(/~/g, '')
+            .replace(/\\/g, '')                   // Strip remaining backslashes
+            .replace(/\^\{([^}]+)\}/g, '^$1')     // Flatten exponents ^{3x} -> ^3x
+            .toLowerCase();                       // Standardize casing
+        };
 
-        // isEqual checks true mathematical equivalence (e.g., x+x == 2x)
-        // rather than just structural string matching
-        const isEquivalent = studentExpr.isEqual(correctExpr);
+        const cleanStudent = normalize(studentAnswer);
+        const cleanCorrect = normalize(correctAnswer);
+
+        console.log(`Debug: Comparing [${cleanStudent}] to [${cleanCorrect}]`);
+
+        // 2. Direct string equivalence check
+        const isEquivalent = cleanStudent === cleanCorrect;
 
         resolve({ 
             success: true, 
-            is_equivalent: isEquivalent 
+            is_equivalent: isEquivalent,
+            debug: `Read as: ${cleanStudent}`
         });
 
       } catch (error) {
-        console.error("🔥 JS Compute Engine Failed:", error);
-        resolve({ 
-            success: false, 
-            error: `JS Compute Engine Error: ${error.message}` 
-        });
+        console.error("🔥 Native JS Engine Failed:", error);
+        resolve({ success: false, error: `Native Engine Crash: ${error.message}` });
       }
     });
   }
