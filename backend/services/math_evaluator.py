@@ -7,15 +7,20 @@ def sanitize_latex(latex_str):
     if not latex_str:
         return ""
         
-    # Scrub out MathLive's special UI tags so SymPy doesn't crash
+    # Ultra-aggressive scrubbing of MathLive formatting tags
     replacements = [
         (r'\cdot', '*'),
+        (r'\times', '*'),
         (r'\mleft', r'\left'),
         (r'\mright', r'\right'),
+        (r'\left', ''),      # Strip all dynamic sizing
+        (r'\right', ''),     
         (r'\exponentialE', 'e'),
-        (r'\ ', ''),      # Remove weird spacing
-        (r'\left(', '('), # Simplify brackets
-        (r'\right)', ')')
+        (r'\mathrm{e}', 'e'), # MathLive's default 'e'
+        (r'\mathit{e}', 'e'),
+        (r'\ ', ''),          # Strip weird spacing
+        (r'~', ''),
+        (r'\,', '')
     ]
     
     for old, new in replacements:
@@ -26,24 +31,19 @@ def sanitize_latex(latex_str):
 def evaluate():
     try:
         if len(sys.argv) < 3:
-            return {"success": False, "error": "Missing arguments"}
+            return {"success": False, "error": "Missing arguments passed to Python."}
 
-        # 1. Grab the raw LaTeX from the Node.js server
         student_raw = sys.argv[1]
         correct_raw = sys.argv[2]
 
-        # 2. Sanitize both strings
         student_clean = sanitize_latex(student_raw)
         correct_clean = sanitize_latex(correct_raw)
 
-        # 3. Parse strings into SymPy math expressions
         student_expr = parse_latex(student_clean)
         correct_expr = parse_latex(correct_clean)
 
-        # 4. Subtract them. If they are mathematically identical, the result is exactly 0.
         diff = simplify(student_expr - correct_expr)
         
-        # Fallback: If simplify() doesn't catch it, try expand() (e.g. factored vs distributed)
         if diff != 0:
             diff = expand(student_expr - correct_expr)
 
@@ -59,7 +59,7 @@ def evaluate():
         return {
             "success": False,
             "is_equivalent": False,
-            "error": str(e)
+            "error": f"SymPy Parse Error: {str(e)}"
         }
 
 if __name__ == "__main__":

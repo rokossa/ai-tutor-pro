@@ -11,24 +11,24 @@ export default function PracticeArena() {
   const [status, setStatus] = useState('idle'); 
   const [visibleHints, setVisibleHints] = useState(0);
   const [showSolution, setShowSolution] = useState(false);
+  const [debugMsg, setDebugMsg] = useState(''); // NEW: Holds our engine errors
   const mathFieldRef = useRef(null);
 
   useEffect(() => {
     fetchExercise();
   }, []);
 
-  // 💡 THE FIX: Safely control the MathLive element via its JavaScript reference
   useEffect(() => {
     const mf = mathFieldRef.current;
     if (mf) {
-      // Set the readOnly property directly instead of using a buggy HTML attribute
       mf.readOnly = (status === 'correct' || showSolution);
-
       const handleInput = () => {
         setStudentAnswer(mf.value);
-        if (status !== 'correct') setStatus('idle');
+        if (status !== 'correct') {
+            setStatus('idle');
+            setDebugMsg('');
+        }
       };
-      
       mf.addEventListener('input', handleInput);
       return () => mf.removeEventListener('input', handleInput);
     }
@@ -40,6 +40,7 @@ export default function PracticeArena() {
     setStudentAnswer('');
     setVisibleHints(0);
     setShowSolution(false);
+    setDebugMsg('');
     
     try {
       setTimeout(() => {
@@ -71,14 +72,22 @@ export default function PracticeArena() {
         }) 
       });
       const data = await response.json(); 
+      
       if (data.is_correct) {
         setStatus('correct');
+        setDebugMsg('');
       } else {
         setStatus('incorrect');
+        // Unmask the error!
+        if (data.error) {
+            setDebugMsg(`Engine Error: ${data.error}`);
+        } else if (data.debug) {
+            setDebugMsg(`Debug: Python read your answer as: ${data.debug}`);
+        }
       }
     } catch (error) {
-      console.error("Evaluation failed", error);
       setStatus('incorrect');
+      setDebugMsg(`Network/Server Error: ${error.message}`);
     }
   };
 
@@ -88,14 +97,7 @@ export default function PracticeArena() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center font-sans">
-        <div className="w-16 h-16 border-4 border-[#4338CA] border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-slate-500 font-bold">Gemini is generating your personalized exercise...</p>
-      </div>
-    );
-  }
+  if (loading) return <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center font-sans"><div className="w-16 h-16 border-4 border-[#4338CA] border-t-transparent rounded-full animate-spin mb-4"></div><p className="text-slate-500 font-bold">Generating exercise...</p></div>;
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] p-4 md:p-8 font-sans">
@@ -121,42 +123,23 @@ export default function PracticeArena() {
             <label className="block text-xs font-black text-slate-400 uppercase tracking-widest px-1">Your Answer</label>
             <div className={`flex items-center border-2 rounded-2xl overflow-hidden transition p-2 bg-white ${status === 'correct' ? 'border-[#14b8a6] bg-teal-50' : status === 'incorrect' ? 'border-amber-500 bg-amber-50' : 'border-slate-200 focus-within:border-[#4338CA]'}`}>
               <div className="px-4 py-4 font-serif italic text-slate-400 border-r border-slate-200">f'(x) =</div>
-              
-              {/* Removed the buggy HTML read-only attribute entirely! */}
-              <math-field 
-                ref={mathFieldRef}
-                style={{ width: '100%', fontSize: '1.5rem', padding: '12px', backgroundColor: 'transparent', border: 'none', outline: 'none' }}
-              ></math-field>
-
+              <math-field ref={mathFieldRef} style={{ width: '100%', fontSize: '1.5rem', padding: '12px', backgroundColor: 'transparent', border: 'none', outline: 'none' }}></math-field>
             </div>
           </div>
 
           {showSolution && (
             <div className="mt-8 bg-slate-900 text-white p-8 rounded-3xl animate-in slide-in-from-top-4">
-              <h3 className="text-lg font-black text-indigo-400 mb-4 flex items-center gap-2">
-                <BrainCircuit size={20} /> Step-by-Step Solution
-              </h3>
-              <div className="prose prose-invert max-w-none text-lg leading-relaxed whitespace-pre-line">
-                <Latex>{exercise.full_solution}</Latex>
-              </div>
+              <h3 className="text-lg font-black text-indigo-400 mb-4 flex items-center gap-2"><BrainCircuit size={20} /> Step-by-Step Solution</h3>
+              <div className="prose prose-invert max-w-none text-lg leading-relaxed whitespace-pre-line"><Latex>{exercise.full_solution}</Latex></div>
             </div>
           )}
 
           <div className="mt-8 space-y-4">
             {exercise.hints.slice(0, visibleHints).map((hint, idx) => (
-              <div key={idx} className="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex gap-3 text-amber-900 animate-in slide-in-from-top-2">
-                <Lightbulb className="shrink-0 text-amber-500" size={20} />
-                <div className="text-sm font-medium"><Latex>{hint}</Latex></div>
-              </div>
+              <div key={idx} className="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex gap-3 text-amber-900"><Lightbulb className="shrink-0 text-amber-500" size={20} /><div className="text-sm font-medium"><Latex>{hint}</Latex></div></div>
             ))}
-            
             {visibleHints < exercise.hints.length && status !== 'correct' && !showSolution && (
-              <button 
-                onClick={revealHint}
-                className="text-sm font-bold text-[#4338CA] hover:text-indigo-800 transition flex items-center gap-1"
-              >
-                + Need a hint? ({exercise.hints.length - visibleHints} remaining)
-              </button>
+              <button onClick={revealHint} className="text-sm font-bold text-[#4338CA] hover:text-indigo-800 transition flex items-center gap-1">+ Need a hint? ({exercise.hints.length - visibleHints} remaining)</button>
             )}
           </div>
         </div>
@@ -164,39 +147,30 @@ export default function PracticeArena() {
         <div className="flex justify-between items-center mt-6">
           {status !== 'correct' && !showSolution ? (
             <div className="w-full flex justify-between items-center gap-4">
-              <button 
-                onClick={() => setShowSolution(true)}
-                className="text-slate-500 hover:text-slate-800 font-bold flex items-center gap-2 transition px-4 py-2 rounded-xl hover:bg-slate-100"
-              >
-                <Eye size={18} /> Show Solution
-              </button>
-              
-              <button 
-                onClick={checkAnswer}
-                disabled={!studentAnswer.trim()}
-                className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-lg hover:bg-slate-800 transition shadow-lg disabled:opacity-50"
-              >
-                Check Answer
-              </button>
+              <button onClick={() => setShowSolution(true)} className="text-slate-500 hover:text-slate-800 font-bold flex items-center gap-2 transition px-4 py-2 rounded-xl hover:bg-slate-100"><Eye size={18} /> Show Solution</button>
+              <button onClick={checkAnswer} disabled={!studentAnswer.trim()} className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-lg hover:bg-slate-800 transition shadow-lg disabled:opacity-50">Check Answer</button>
             </div>
           ) : (
             <div className={`w-full flex items-center justify-between p-4 pl-6 rounded-2xl shadow-lg animate-in fade-in ${status === 'correct' ? 'bg-[#14b8a6] text-white' : 'bg-slate-800 text-white'}`}>
               <div className="flex items-center gap-3 font-bold text-lg">
                 {status === 'correct' ? <><CheckCircle2 size={24} /> Brilliant work!</> : <><Eye size={24} /> Review the solution carefully.</>}
               </div>
-              <button 
-                onClick={fetchExercise}
-                className={`px-6 py-2 rounded-xl font-black transition flex items-center gap-2 ${status === 'correct' ? 'bg-white text-[#14b8a6] hover:bg-teal-50' : 'bg-[#4338CA] text-white hover:bg-indigo-600'}`}
-              >
-                Next Challenge <ArrowRight size={18} />
-              </button>
+              <button onClick={fetchExercise} className={`px-6 py-2 rounded-xl font-black transition flex items-center gap-2 ${status === 'correct' ? 'bg-white text-[#14b8a6] hover:bg-teal-50' : 'bg-[#4338CA] text-white hover:bg-indigo-600'}`}>Next Challenge <ArrowRight size={18} /></button>
             </div>
           )}
         </div>
 
+        {/* THE NEW ERROR CONSOLE */}
         {status === 'incorrect' && !showSolution && (
-          <div className="mt-6 flex items-center justify-center gap-2 text-amber-600 font-bold animate-in zoom-in">
-            <XCircle size={20} /> Not quite right. Try a hint or view the solution!
+          <div className="mt-6 flex flex-col items-center justify-center gap-2 animate-in zoom-in">
+            <div className="flex items-center gap-2 text-amber-600 font-bold">
+              <XCircle size={20} /> Not quite right. Try a hint or view the solution!
+            </div>
+            {debugMsg && (
+              <div className="mt-2 p-3 bg-slate-900 text-amber-400 font-mono text-xs rounded-xl max-w-lg text-center break-words border border-slate-700 shadow-inner">
+                {debugMsg}
+              </div>
+            )}
           </div>
         )}
 
