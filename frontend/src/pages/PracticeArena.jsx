@@ -42,25 +42,19 @@ export default function PracticeArena() {
     setShowSolution(false);
     setDebugMsg('');
     
-    try {
-      // Mock data for initial load
-      setTimeout(() => {
-        setExercise({
-          problem_statement: "Find the derivative of the function $f(x) = x^2 e^{-3x}$ with respect to $x$.",
-          correct_answer_latex: "2xe^{-3x}-3x^2e^{-3x}",
-          hints: ["Product rule: (uv)' = u'v + uv'", "u = x^2, v = e^-3x", "v' = -3e^-3x"],
-          full_solution: "f'(x) = 2xe^{-3x} - 3x^2e^{-3x}"
-        });
-        setLoading(false);
-      }, 500);
-    } catch (err) {
-      console.error("Failed to fetch exercise");
-    }
+    setTimeout(() => {
+      setExercise({
+        problem_statement: "Find the derivative of the function $f(x) = x^2 e^{-3x}$ with respect to $x$.",
+        correct_answer_latex: "2xe^{-3x}-3x^2e^{-3x}",
+        hints: ["Product rule: (uv)' = u'v + uv'", "u = x^2, v = e^-3x", "v' = -3e^-3x"],
+        full_solution: "f'(x) = 2xe^{-3x} - 3x^2e^{-3x}"
+      });
+      setLoading(false);
+    }, 500);
   };
 
   const checkAnswer = async () => {
     try {
-      // 💡 HARDWIRED ABSOLUTE URL
       const response = await fetch("https://ai-tutor-pro-backend.onrender.com/api/evaluate", { 
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
@@ -71,13 +65,8 @@ export default function PracticeArena() {
       });
       
       const rawText = await response.text();
-      if (!rawText) {
-         setStatus('incorrect');
-         setDebugMsg("Error: Empty response from backend.");
-         return;
-      }
-
       const data = JSON.parse(rawText);
+      
       if (data.is_correct) {
         setStatus('correct');
       } else {
@@ -94,8 +83,8 @@ export default function PracticeArena() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] p-8 font-sans">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-[32px] p-12 shadow-sm border border-slate-200 mb-6">
+      <div className="max-w-3xl mx-auto text-center">
+        <div className="bg-white rounded-[32px] p-12 shadow-sm border border-slate-200 mb-6 text-left">
           <div className="text-2xl text-slate-900 mb-10"><Latex>{exercise.problem_statement}</Latex></div>
           <div className={`flex items-center border-2 rounded-2xl p-2 bg-white ${status === 'correct' ? 'border-[#14b8a6] bg-teal-50' : status === 'incorrect' ? 'border-amber-500 bg-amber-50' : 'border-slate-200'}`}>
             <div className="px-4 py-4 font-serif italic text-slate-400 border-r border-slate-200">f'(x) =</div>
@@ -109,8 +98,8 @@ export default function PracticeArena() {
           <button onClick={checkAnswer} className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-lg">Check Answer</button>
         </div>
 
-        {status === 'incorrect' && <div className="mt-6 text-center text-amber-600 font-bold">{debugMsg || "Not quite right!"}</div>}
-        {status === 'correct' && <div className="mt-6 text-center text-[#14b8a6] font-bold text-2xl animate-bounce">Brilliant work! 🎉</div>}
+        {status === 'incorrect' && <div className="mt-6 text-amber-600 font-bold">{debugMsg || "Not quite right!"}</div>}
+        {status === 'correct' && <div className="mt-6 text-[#14b8a6] font-bold text-2xl animate-bounce text-center">Brilliant work! 🎉</div>}
       </div>
     </div>
   );
