@@ -13,4 +13,6 @@ app.use(express.json());
 app.use('/api/evaluate', require('./routes/evaluate'));
 
 const PORT = process.env.PORT || 10000;
+app.use('/api/profile', require('./routes/profile'));
+
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

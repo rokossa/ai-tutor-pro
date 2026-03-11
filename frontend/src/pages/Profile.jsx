@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Award, Clock, BookOpen, CreditCard, Users, BookMarked, BarChart3, ChevronRight, Edit2 } from 'lucide-react';
+import { Settings, Award, Clock, BookOpen, CreditCard, Users, BookMarked, BarChart3, ChevronRight, Edit2, Sparkles } from 'lucide-react';
 
 export default function Profile() {
-  const [activeRole, setActiveRole] = useState('student'); // 'student', 'parent', 'teacher'
+  const [activeRole, setActiveRole] = useState('student');
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -144,7 +144,6 @@ export default function Profile() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Col 1 */}
               <div className="md:col-span-1 flex flex-col gap-6">
                 <div className="bg-white p-6 rounded-[24px] border border-slate-200 shadow-sm">
                   <h3 className="font-black text-lg mb-4 flex items-center justify-between">Educator Profile <Edit2 size={16} className="text-slate-400"/></h3>
@@ -159,7 +158,6 @@ export default function Profile() {
                 </div>
               </div>
 
-              {/* Col 2 */}
               <div className="md:col-span-1 flex flex-col gap-6">
                 <div className="bg-white p-6 rounded-[24px] border border-slate-200 shadow-sm">
                   <h3 className="font-black text-lg mb-4">My Students</h3>
@@ -176,7 +174,6 @@ export default function Profile() {
                 </div>
               </div>
 
-              {/* Col 3 */}
               <div className="md:col-span-1 flex flex-col gap-6">
                 <div className="bg-white p-6 rounded-[24px] border border-slate-200 shadow-sm">
                   <h3 className="font-black text-lg mb-4">Facilitation Tools</h3>
@@ -188,7 +185,6 @@ export default function Profile() {
                 </div>
               </div>
 
-              {/* Analytics Span */}
               <div className="md:col-span-3 bg-white p-6 rounded-[24px] border border-slate-200 shadow-sm flex flex-wrap justify-around items-center gap-4">
                  <div className="text-center">
                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Group Mastery Avg.</p>
