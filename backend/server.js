@@ -6,7 +6,7 @@ require('dotenv').config();
 const app = express();
 connectDB();
 
-app.use(cors());
+app.use(cors({ origin: 'https://ai-tutor-pro-k88k.onrender.com' }));
 app.use(express.json());
 
 // Routes
