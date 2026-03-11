@@ -7,7 +7,6 @@ import 'katex/dist/katex.min.css';
 import Latex from 'react-latex-next';
 import 'mathlive';
 
-// Map string names from backend to actual Lucide React components
 const iconMap = {
   'Calculator': Calculator,
   'FlaskConical': FlaskConical,
@@ -18,19 +17,16 @@ const iconMap = {
 
 export default function StudentJourney() {
   const [currentView, setCurrentView] = useState('dashboard'); 
-  const [studentGrade, setStudentGrade] = useState('Grade 8'); // This will eventually come from user login
+  const [studentGrade, setStudentGrade] = useState('Grade 8'); // Locked for now until Settings page is built
   
-  // Dynamic Data States
   const [subjects, setSubjects] = useState([]);
   const [curriculumData, setCurriculumData] = useState({});
   const [dataLoading, setDataLoading] = useState(true);
 
-  // Active Selections
   const [activeSubject, setActiveSubject] = useState(null);
   const [activeDomain, setActiveDomain] = useState(null);
   const [activeSkill, setActiveSkill] = useState(null);
 
-  // Practice States
   const [exercise, setExercise] = useState(null);
   const [loading, setLoading] = useState(false);
   const [studentAnswer, setStudentAnswer] = useState('');
@@ -40,7 +36,6 @@ export default function StudentJourney() {
 
   const BACKEND_URL = "https://ai-tutor-pro-backend.onrender.com";
 
-  // 💡 FETCH CURRICULUM ON LOAD
   useEffect(() => {
     const fetchCurriculum = async () => {
       setDataLoading(true);
@@ -52,7 +47,7 @@ export default function StudentJourney() {
           setCurriculumData(result.data.curriculum);
         }
       } catch (err) {
-        console.error("Failed to fetch curriculum from backend");
+        console.error("Failed to fetch curriculum");
       } finally {
         setDataLoading(false);
       }
@@ -141,34 +136,44 @@ export default function StudentJourney() {
     return (
       <div className="min-h-screen bg-[#F8F9FA] p-8 font-sans">
         <div className="max-w-5xl mx-auto">
+          {/* 💡 REPLACED DROPDOWN WITH CLEAN STATIC PILL */}
           <div className="flex items-center justify-between mb-8">
-            <select 
-              className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold outline-none cursor-pointer"
-              value={studentGrade}
-              onChange={(e) => setStudentGrade(e.target.value)}
-            >
-              <option value="Grade 8">Grade 8</option>
-              <option value="Grade 9">Grade 9</option>
-            </select>
-            <div className="w-8 h-8 bg-slate-200 rounded-full"></div>
-          </div>
-
-          <div className="bg-gradient-to-r from-indigo-100 to-purple-50 rounded-[32px] p-8 mb-10 flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-black text-slate-900 flex items-center gap-2">Welcome back, David! <Sparkles className="text-amber-500"/></h1>
-              <p className="text-slate-600 mt-2 font-medium">Ready for {studentGrade}? <span className="text-amber-600 font-bold ml-2">8-day streak ✨</span></p>
+            <div className="bg-indigo-600 text-white px-5 py-2 rounded-full font-bold text-sm shadow-sm">
+              {studentGrade}
+            </div>
+            <div className="flex gap-4 items-center">
+              <div className="w-10 h-10 bg-slate-300 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=David" alt="Avatar" className="w-full h-full object-cover" />
+              </div>
             </div>
           </div>
+
+          <div className="bg-gradient-to-r from-indigo-100 to-purple-50 rounded-[32px] p-8 mb-10 flex justify-between items-center shadow-sm border border-indigo-50">
+            <div>
+              <h1 className="text-3xl font-black text-slate-900 flex items-center gap-2">Welcome back, David! <Sparkles className="text-amber-500" size={24}/></h1>
+              <p className="text-slate-600 mt-2 font-medium">Ready for {studentGrade}? <span className="text-amber-600 font-bold ml-2">8-day streak ✨</span></p>
+            </div>
+            <div className="hidden md:block text-center bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
+              <div className="w-20 h-20 rounded-full border-[6px] border-indigo-600 flex items-center justify-center mx-auto">
+                <span className="text-xl font-black text-indigo-900">68%</span>
+              </div>
+              <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest">Overall Mastery</p>
+            </div>
+          </div>
+
           <h2 className="text-2xl font-black text-slate-900 mb-6">Your Subjects</h2>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {subjects.map(sub => {
               const IconComponent = iconMap[sub.iconName] || BookOpen;
               return (
-                <div key={sub.id} className="bg-white rounded-[24px] p-6 border shadow-sm flex flex-col items-center text-center cursor-pointer hover:shadow-md transition" 
+                <div key={sub.id} className="bg-white rounded-[24px] p-6 border border-slate-200 shadow-sm flex flex-col items-center text-center cursor-pointer hover:shadow-md hover:border-indigo-300 transition" 
                      onClick={() => { setActiveSubject(sub); setCurrentView('domains'); }}>
-                  <div className={`w-14 h-14 ${sub.color} rounded-2xl flex items-center justify-center text-white mb-4`}><IconComponent size={28} /></div>
+                  <div className={`w-14 h-14 ${sub.color} rounded-2xl flex items-center justify-center text-white mb-4 shadow-sm`}><IconComponent size={28} /></div>
                   <h3 className="font-bold text-slate-800 mb-1">{sub.name}</h3>
-                  <button className="mt-4 w-full py-2 bg-indigo-50 text-indigo-700 font-bold rounded-xl text-sm">Explore</button>
+                  <div className="text-xs font-bold text-emerald-600 mt-1 mb-4 flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div> {sub.progress}%
+                  </div>
+                  <button className="w-full py-2 bg-indigo-50 text-indigo-700 font-bold rounded-xl text-sm transition hover:bg-indigo-600 hover:text-white">Explore</button>
                 </div>
               );
             })}
@@ -189,11 +194,14 @@ export default function StudentJourney() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {activeDomains.map((dom) => (
               <div key={dom.id} onClick={() => { setActiveDomain(dom); setCurrentView('skills'); }} 
-                   className={`rounded-[32px] p-8 cursor-pointer transition shadow-sm border ${dom.recommended ? 'bg-[#0f172a] text-white border-slate-800' : 'bg-white text-slate-900 border-slate-200 hover:border-indigo-300'}`}>
-                {dom.recommended && <div className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full w-fit mb-4">Recommended</div>}
+                   className={`rounded-[32px] p-8 cursor-pointer transition shadow-sm border ${dom.recommended ? 'bg-[#0f172a] text-white border-slate-800 hover:bg-slate-800' : 'bg-white text-slate-900 border-slate-200 hover:border-indigo-300'}`}>
+                {dom.recommended && <div className="bg-white/10 text-slate-200 text-xs font-bold px-3 py-1.5 rounded-full w-fit mb-6">Recommended</div>}
                 <div className="flex justify-between items-center">
-                  <h3 className="text-2xl font-black">{dom.name}</h3>
-                  <div className="w-20 h-20 rounded-full border-8 flex items-center justify-center font-black text-xl" style={{ borderColor: '#14b8a6' }}>{dom.progress}%</div>
+                  <div>
+                    <h3 className="text-2xl font-black mb-2">{dom.name}</h3>
+                    <div className={`font-bold flex items-center gap-1 text-sm ${dom.recommended ? 'text-indigo-300' : 'text-slate-400'}`}>View Skills <ChevronRight size={16}/></div>
+                  </div>
+                  <div className="w-20 h-20 rounded-full border-[6px] flex items-center justify-center font-black text-xl bg-white/5" style={{ borderColor: '#14b8a6', color: dom.recommended ? '#fff' : '#0f172a' }}>{dom.progress}%</div>
                 </div>
               </div>
             ))}
@@ -208,18 +216,21 @@ export default function StudentJourney() {
     return (
       <div className="min-h-screen bg-[#F8F9FA] p-8 font-sans">
         <div className="max-w-4xl mx-auto">
-          <button onClick={() => setCurrentView('domains')} className="flex items-center gap-2 text-slate-500 font-bold mb-6"><ArrowLeft size={18}/> Back to Domains</button>
+          <button onClick={() => setCurrentView('domains')} className="flex items-center gap-2 text-slate-500 font-bold mb-6 hover:text-slate-800 transition"><ArrowLeft size={18}/> Back to Domains</button>
           <div className="text-sm font-bold text-slate-400 mb-2">{studentGrade} {'>'} {activeSubject?.name} {'>'} {activeDomain?.name}</div>
           <h1 className="text-3xl font-black text-slate-900 mb-8">{activeDomain?.name} - Skills to Master</h1>
           
-          <div className="bg-white rounded-[32px] p-4 border shadow-sm space-y-2">
+          <div className="bg-white rounded-[32px] p-4 border border-slate-200 shadow-sm space-y-2">
             {activeSkills.map(skill => (
-              <div key={skill.id} className="flex justify-between items-center p-4 hover:bg-slate-50 rounded-2xl transition">
-                <div className="w-full mr-4">
-                  <h3 className="text-lg font-bold text-slate-800">{skill.name}</h3>
-                  <div className="w-full max-w-sm bg-slate-100 h-2 rounded-full mt-2"><div className="bg-[#14b8a6] h-full rounded-full" style={{ width: `${skill.mastery}%` }}></div></div>
+              <div key={skill.id} className="flex justify-between items-center p-4 hover:bg-slate-50 rounded-2xl transition border border-transparent hover:border-slate-100">
+                <div className="w-full mr-6">
+                  <div className="flex justify-between items-end mb-2">
+                    <h3 className="text-lg font-bold text-slate-800">{skill.name}</h3>
+                    <span className="text-xs font-bold text-emerald-600">{skill.mastery}% Mastered</span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden"><div className="bg-[#14b8a6] h-full rounded-full transition-all duration-500" style={{ width: `${skill.mastery}%` }}></div></div>
                 </div>
-                <button onClick={() => startPractice(skill)} className="bg-indigo-600 hover:bg-indigo-700 transition text-white font-bold py-3 px-6 rounded-xl shrink-0">Start Exercises</button>
+                <button onClick={() => startPractice(skill)} className="bg-indigo-600 hover:bg-indigo-700 transition shadow-md text-white font-bold py-3 px-6 rounded-xl shrink-0">Start Exercises</button>
               </div>
             ))}
             {activeSkills.length === 0 && <p className="p-4 text-slate-500 font-bold">No skills added to this domain yet.</p>}
@@ -229,23 +240,37 @@ export default function StudentJourney() {
     );
   }
 
-  // Practice View omitted for brevity (unchanged logic)
   return (
-    <div className="min-h-screen bg-[#F8F9FA] p-8 font-sans">
+    <div className="min-h-screen bg-[#F8F9FA] p-4 md:p-8 font-sans">
       <div className="max-w-5xl mx-auto">
-        <div className="flex justify-between mb-6">
-          <div className="text-sm font-bold text-slate-500">{activeSubject?.name} {'>'} {activeSkill?.name}</div>
-          <button onClick={() => setCurrentView('skills')} className="font-bold text-indigo-600"><Pause size={18} className="inline mr-1"/> Pause</button>
+        <div className="flex justify-between items-center mb-6">
+          <div className="text-sm font-bold text-slate-500 hidden md:block">{activeSubject?.name} {'>'} {activeDomain?.name} {'>'} <span className="text-slate-900">{activeSkill?.name}</span></div>
+          <button onClick={() => setCurrentView('skills')} className="font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-4 py-2 rounded-xl transition"><Pause size={16} className="inline mr-2"/> Pause & Return</button>
         </div>
+        
         {loading ? (
-          <div className="bg-white rounded-[32px] p-12 text-center border border-slate-200"><div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>Generating...</div>
+          <div className="bg-white rounded-[32px] p-16 text-center border border-slate-200 shadow-sm">
+            <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+            <p className="font-bold text-slate-600 text-lg">Generating personalized exercise...</p>
+          </div>
         ) : (
-          <div className="bg-white rounded-[32px] p-8 border border-slate-200">
-             <div className="text-xl mb-8"><Latex>{exercise?.problem_statement}</Latex></div>
-             <math-field ref={mathFieldRef} style={{ width: '100%', fontSize: '1.5rem', padding: '12px', border: '2px solid #e2e8f0', borderRadius: '12px' }}></math-field>
-             <div className="flex justify-end mt-8"><button onClick={checkAnswer} className="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold">Check Answer</button></div>
-             {status === 'incorrect' && <div className="mt-4 text-amber-600 font-bold">Try again!</div>}
-             {status === 'correct' && <div className="mt-4 text-[#14b8a6] font-bold text-xl">Brilliant work!</div>}
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex-1 bg-white rounded-[32px] p-8 md:p-10 border border-slate-200 shadow-sm">
+               <div className="text-2xl text-slate-900 mb-10"><Latex>{exercise?.problem_statement}</Latex></div>
+               <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Your Answer</label>
+               <div className={`flex items-center border-4 rounded-2xl p-2 bg-white transition-colors ${status === 'correct' ? 'border-[#14b8a6] bg-teal-50' : 'border-[#2D9CDB] focus-within:border-indigo-600'}`}>
+                 <math-field ref={mathFieldRef} style={{ width: '100%', fontSize: '1.5rem', padding: '12px', border: 'none', outline: 'none' }}></math-field>
+               </div>
+               
+               <div className="flex justify-between items-center mt-10">
+                 <button onClick={() => setShowSolution(true)} className="text-slate-500 hover:bg-slate-100 font-bold px-5 py-3 rounded-xl transition">Show Solution</button>
+                 <button onClick={checkAnswer} className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-4 rounded-xl font-black text-lg shadow-lg transition">Check Answer</button>
+               </div>
+               
+               {showSolution && <div className="mt-8 bg-slate-900 text-white p-6 rounded-3xl"><Latex>{exercise?.full_solution}</Latex></div>}
+               {status === 'incorrect' && <div className="mt-6 text-amber-600 font-bold text-center">Not quite right, try again!</div>}
+               {status === 'correct' && <div className="mt-6 text-[#14b8a6] font-black text-2xl text-center animate-bounce">Brilliant work! 🎉</div>}
+            </div>
           </div>
         )}
       </div>
