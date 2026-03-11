@@ -1,33 +1,38 @@
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
 exports.generateExercise = async (req, res) => {
   try {
-    const { subject } = req.body;
-    let pool = [];
-
-    // Smart Fallback Pool: This guarantees the frontend ALWAYS gets a perfectly formatted 
-    // problem regardless of API keys or AI latency.
-    if (subject === 'Algebra') {
-      pool = [
-        { problem_statement: "Expand the expression: $(x+3)(x-2)$", correct_answer_latex: "x^2+x-6", full_solution: "x^2 - 2x + 3x - 6 = x^2 + x - 6" },
-        { problem_statement: "Expand the expression: $(2x+1)(x-4)$", correct_answer_latex: "2x^2-7x-4", full_solution: "2x^2 - 8x + x - 4 = 2x^2 - 7x - 4" }
-      ];
-    } else if (subject === 'Chemistry') {
-      pool = [
-        { problem_statement: "Using Boyle's Law ($P_1V_1 = P_2V_2$), if $P_1=2$ atm, $V_1=4$ L, and $P_2=4$ atm, what is $V_2$?", correct_answer_latex: "2", full_solution: "V_2 = (P_1 * V_1) / P_2 = (2 * 4) / 4 = 2" },
-        { problem_statement: "Using Boyle's Law ($P_1V_1 = P_2V_2$), if $P_1=3$ atm, $V_1=6$ L, and $P_2=2$ atm, what is $V_2$?", correct_answer_latex: "9", full_solution: "V_2 = (P_1 * V_1) / P_2 = (3 * 6) / 2 = 9" }
-      ];
-    } else {
-      // Default to Calculus
-      pool = [
-        { problem_statement: "Find the derivative of $f(x) = 3x^2 e^{-2x}$.", correct_answer_latex: "6xe^{-2x}-6x^2e^{-2x}", full_solution: "f'(x) = 6xe^{-2x} - 6x^2e^{-2x}" },
-        { problem_statement: "Find the derivative of $f(x) = 4x^3 e^{-x}$.", correct_answer_latex: "12x^2e^{-x}-4x^3e^{-x}", full_solution: "f'(x) = 12x^2e^{-x} - 4x^3e^{-x}" }
-      ];
+    const { subject, topic } = req.body;
+    
+    // Safety check for API key
+    if (!process.env.GEMINI_API_KEY) {
+       throw new Error("GEMINI_API_KEY is missing in Render environment variables.");
     }
 
-    // Pick a random problem from the selected subject
-    const randomExercise = pool[Math.floor(Math.random() * pool.length)];
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    res.json({ success: true, exercise: randomExercise });
+    // 💡 THE PROMPT: Forcing Gemini to act as the tutor and return strict JSON
+    const prompt = `You are an expert AI tutor for Grade 8 students. 
+    Generate a unique practice problem for the subject "${subject}" and topic "${topic}".
+    Return ONLY a valid, raw JSON object. Do not include markdown formatting, backticks, or extra text.
+    The JSON must have these exact keys:
+    "problem_statement": "The question text, using LaTeX for math enclosed in $",
+    "correct_answer_latex": "The exact mathematical answer in clean LaTeX (no spaces, no equations like x=, just the value)",
+    "full_solution": "A brief step-by-step explanation using LaTeX enclosed in $"`;
+
+    console.log(`🧠 Asking Gemini to generate a ${subject} - ${topic} problem...`);
+    
+    const result = await model.generateContent(prompt);
+    let text = result.response.text();
+    
+    // Clean up markdown if Gemini accidentally includes it
+    text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+    const exercise = JSON.parse(text);
+
+    res.json({ success: true, exercise });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error("🔥 Gemini Error:", error.message);
+    res.status(500).json({ success: false, error: "Failed to connect to Gemini AI." });
   }
 };

@@ -3,15 +3,16 @@ const mongoose = require('mongoose');
 const connectDB = async () => {
   try {
     if (!process.env.MONGO_URI) {
-      console.warn("⚠️ MONGO_URI is missing. Database will not connect.");
-      return;
+        console.error("🔥 FATAL ERROR: MONGO_URI environment variable is missing!");
+        return;
     }
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error(`❌ MongoDB Connection Error: ${error.message}`);
-    console.warn("⚠️ Server is staying alive, but database features will not work until the MONGO_URI password is fixed.");
-    // We completely removed process.exit(1) so the server doesn't crash!
+    
+    console.log("⏳ Attempting to connect to MongoDB...");
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("✅ MongoDB Connected Successfully!");
+  } catch (err) {
+    console.error("🔥 MongoDB Connection Failed! Ensure your Render IP is whitelisted in MongoDB Atlas.");
+    console.error("Error details:", err.message);
   }
 };
 
