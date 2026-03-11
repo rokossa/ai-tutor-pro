@@ -1,26 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Calculator, FlaskConical, BookOpen, Globe, MessageCircle, 
-  ChevronRight, ArrowLeft, Pause, Sparkles
-} from 'lucide-react';
+import { Calculator, FlaskConical, BookOpen, Globe, MessageCircle, ChevronRight, ArrowLeft, Pause, Sparkles } from 'lucide-react';
 import 'katex/dist/katex.min.css';
 import Latex from 'react-latex-next';
 import 'mathlive';
 
-const iconMap = {
-  'Calculator': Calculator,
-  'FlaskConical': FlaskConical,
-  'BookOpen': BookOpen,
-  'Globe': Globe,
-  'MessageCircle': MessageCircle
-};
+const iconMap = { 'Calculator': Calculator, 'FlaskConical': FlaskConical, 'BookOpen': BookOpen, 'Globe': Globe, 'MessageCircle': MessageCircle };
 
 export default function StudentJourney() {
   const [currentView, setCurrentView] = useState('dashboard'); 
-  const [studentGrade, setStudentGrade] = useState('Grade 8'); // Locked for now until Settings page is built
-  
-  const [subjects, setSubjects] = useState([]);
-  const [curriculumData, setCurriculumData] = useState({});
+  const [studentData, setStudentData] = useState(null);
   const [dataLoading, setDataLoading] = useState(true);
 
   const [activeSubject, setActiveSubject] = useState(null);
@@ -36,27 +24,31 @@ export default function StudentJourney() {
 
   const BACKEND_URL = "https://ai-tutor-pro-backend.onrender.com";
 
-  useEffect(() => {
-    const fetchCurriculum = async () => {
-      setDataLoading(true);
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/curriculum?grade=${studentGrade}`);
-        const result = await response.json();
-        if (result.success) {
-          setSubjects(result.data.subjects);
-          setCurriculumData(result.data.curriculum);
-        }
-      } catch (err) {
-        console.error("Failed to fetch curriculum");
-      } finally {
-        setDataLoading(false);
-      }
-    };
-    fetchCurriculum();
-  }, [studentGrade]);
+  // FETCH FROM DATABASE
+  const fetchCurriculum = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/curriculum`);
+      const result = await response.json();
+      if (result.success) setStudentData(result.data);
+    } catch (err) {
+      console.error("Failed to fetch database");
+    } finally {
+      setDataLoading(false);
+    }
+  };
 
-  const activeDomains = activeSubject ? (curriculumData[activeSubject.name]?.domains || []) : [];
-  const activeSkills = activeDomain ? (curriculumData[activeSubject?.name]?.skills?.[activeDomain.id] || []) : [];
+  useEffect(() => { fetchCurriculum(); }, []);
+
+  // Update Active States when Data Refreshes (so rings update live!)
+  useEffect(() => {
+    if (studentData && activeSubject) {
+      const updatedSubject = studentData.subjects.find(s => s.id === activeSubject.id);
+      if (updatedSubject) setActiveSubject(updatedSubject);
+    }
+  }, [studentData]);
+
+  const activeDomains = activeSubject ? (studentData?.curriculum[activeSubject.name]?.domains || []) : [];
+  const activeSkills = activeDomain ? (studentData?.curriculum[activeSubject?.name]?.skills?.[activeDomain.id] || []) : [];
 
   useEffect(() => {
     if (currentView === 'practice') {
@@ -91,14 +83,11 @@ export default function StudentJourney() {
         body: JSON.stringify({ subject: requestSubject, topic: skill.name })
       });
       const data = await response.json();
-      if (data.success) {
-        setExercise(data.exercise);
-      } else {
-        throw new Error("Backend failed");
-      }
+      if (data.success) setExercise(data.exercise);
+      else throw new Error("Backend failed");
     } catch (err) {
       setExercise({
-        problem_statement: `Practice Problem for ${skill.name}. (Backend disconnected)`,
+        problem_statement: `Solve the problem for ${skill.name}.`,
         correct_answer_latex: "1",
         full_solution: "Type 1 to pass."
       });
@@ -106,6 +95,26 @@ export default function StudentJourney() {
       setLoading(false);
     }
   };
+
+  const handleCorrectAnswer = async () => {
+    setStatus('correct');
+    try {
+      // 💡 SEND PROGRESS TO DATABASE
+      await fetch(`${BACKEND_URL}/api/curriculum/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          subjectName: activeSubject.name, 
+          domainId: activeDomain.id, 
+          skillId: activeSkill.id 
+        })
+      });
+      // Re-fetch the database to grab the new ring percentages!
+      fetchCurriculum();
+    } catch (e) {
+      console.error("Failed to save progress to database.");
+    }
+  }
 
   const checkAnswer = async () => {
     try {
@@ -115,32 +124,30 @@ export default function StudentJourney() {
         body: JSON.stringify({ student_answer: studentAnswer, correct_answer: exercise.correct_answer_latex }) 
       });
       const data = await response.json();
-      setStatus(data.is_correct ? 'correct' : 'incorrect');
+      if (data.is_correct) {
+        handleCorrectAnswer();
+      } else {
+        setStatus('incorrect');
+      }
     } catch (error) {
       const cleanStudent = studentAnswer.replace(/\s/g, '').replace(/\\cdot/g, '*');
       const cleanCorrect = exercise.correct_answer_latex.replace(/\s/g, '');
-      setStatus(cleanStudent === cleanCorrect ? 'correct' : 'incorrect');
+      if (cleanStudent === cleanCorrect) {
+        handleCorrectAnswer();
+      } else {
+        setStatus('incorrect');
+      }
     }
   };
 
-  if (dataLoading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8F9FA]">
-        <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="font-bold text-slate-500">Loading your curriculum...</p>
-      </div>
-    );
-  }
+  if (dataLoading) return <div className="min-h-screen flex items-center justify-center bg-[#F8F9FA]"><div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div></div>;
 
   if (currentView === 'dashboard') {
     return (
       <div className="min-h-screen bg-[#F8F9FA] p-8 font-sans">
         <div className="max-w-5xl mx-auto">
-          {/* 💡 REPLACED DROPDOWN WITH CLEAN STATIC PILL */}
           <div className="flex items-center justify-between mb-8">
-            <div className="bg-indigo-600 text-white px-5 py-2 rounded-full font-bold text-sm shadow-sm">
-              {studentGrade}
-            </div>
+            <div className="bg-indigo-600 text-white px-5 py-2 rounded-full font-bold text-sm shadow-sm">{studentData?.grade || 'Grade 8'}</div>
             <div className="flex gap-4 items-center">
               <div className="w-10 h-10 bg-slate-300 rounded-full overflow-hidden border-2 border-white shadow-sm">
                 <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=David" alt="Avatar" className="w-full h-full object-cover" />
@@ -150,12 +157,12 @@ export default function StudentJourney() {
 
           <div className="bg-gradient-to-r from-indigo-100 to-purple-50 rounded-[32px] p-8 mb-10 flex justify-between items-center shadow-sm border border-indigo-50">
             <div>
-              <h1 className="text-3xl font-black text-slate-900 flex items-center gap-2">Welcome back, David! <Sparkles className="text-amber-500" size={24}/></h1>
-              <p className="text-slate-600 mt-2 font-medium">Ready for {studentGrade}? <span className="text-amber-600 font-bold ml-2">8-day streak ✨</span></p>
+              <h1 className="text-3xl font-black text-slate-900 flex items-center gap-2">Welcome back, {studentData?.name}! <Sparkles className="text-amber-500" size={24}/></h1>
+              <p className="text-slate-600 mt-2 font-medium">Ready for {studentData?.grade}? <span className="text-amber-600 font-bold ml-2">8-day streak ✨</span></p>
             </div>
-            <div className="hidden md:block text-center bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
+            <div className="hidden md:block text-center bg-white p-4 rounded-3xl shadow-sm border border-slate-100 transition-all duration-1000">
               <div className="w-20 h-20 rounded-full border-[6px] border-indigo-600 flex items-center justify-center mx-auto">
-                <span className="text-xl font-black text-indigo-900">68%</span>
+                <span className="text-xl font-black text-indigo-900">{studentData?.overallMastery || 0}%</span>
               </div>
               <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest">Overall Mastery</p>
             </div>
@@ -163,7 +170,7 @@ export default function StudentJourney() {
 
           <h2 className="text-2xl font-black text-slate-900 mb-6">Your Subjects</h2>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {subjects.map(sub => {
+            {studentData?.subjects.map(sub => {
               const IconComponent = iconMap[sub.iconName] || BookOpen;
               return (
                 <div key={sub.id} className="bg-white rounded-[24px] p-6 border border-slate-200 shadow-sm flex flex-col items-center text-center cursor-pointer hover:shadow-md hover:border-indigo-300 transition" 
@@ -188,7 +195,7 @@ export default function StudentJourney() {
       <div className="min-h-screen bg-[#F8F9FA] p-8 font-sans">
         <div className="max-w-5xl mx-auto">
           <button onClick={() => setCurrentView('dashboard')} className="flex items-center gap-2 text-slate-500 font-bold mb-6 hover:text-slate-800 transition"><ArrowLeft size={18}/> Back to Dashboard</button>
-          <div className="text-sm font-bold text-slate-400 mb-2">{studentGrade} {'>'} {activeSubject?.name}</div>
+          <div className="text-sm font-bold text-slate-400 mb-2">{studentData?.grade} {'>'} {activeSubject?.name}</div>
           <h1 className="text-3xl font-black text-slate-900 mb-8">{activeSubject?.name} - Domains</h1>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -201,11 +208,10 @@ export default function StudentJourney() {
                     <h3 className="text-2xl font-black mb-2">{dom.name}</h3>
                     <div className={`font-bold flex items-center gap-1 text-sm ${dom.recommended ? 'text-indigo-300' : 'text-slate-400'}`}>View Skills <ChevronRight size={16}/></div>
                   </div>
-                  <div className="w-20 h-20 rounded-full border-[6px] flex items-center justify-center font-black text-xl bg-white/5" style={{ borderColor: '#14b8a6', color: dom.recommended ? '#fff' : '#0f172a' }}>{dom.progress}%</div>
+                  <div className="w-20 h-20 rounded-full border-[6px] flex items-center justify-center font-black text-xl transition-all duration-1000" style={{ borderColor: '#14b8a6', color: dom.recommended ? '#fff' : '#0f172a' }}>{dom.progress}%</div>
                 </div>
               </div>
             ))}
-            {activeDomains.length === 0 && <p className="text-slate-500 font-bold">More domains coming soon!</p>}
           </div>
         </div>
       </div>
@@ -217,7 +223,7 @@ export default function StudentJourney() {
       <div className="min-h-screen bg-[#F8F9FA] p-8 font-sans">
         <div className="max-w-4xl mx-auto">
           <button onClick={() => setCurrentView('domains')} className="flex items-center gap-2 text-slate-500 font-bold mb-6 hover:text-slate-800 transition"><ArrowLeft size={18}/> Back to Domains</button>
-          <div className="text-sm font-bold text-slate-400 mb-2">{studentGrade} {'>'} {activeSubject?.name} {'>'} {activeDomain?.name}</div>
+          <div className="text-sm font-bold text-slate-400 mb-2">{studentData?.grade} {'>'} {activeSubject?.name} {'>'} {activeDomain?.name}</div>
           <h1 className="text-3xl font-black text-slate-900 mb-8">{activeDomain?.name} - Skills to Master</h1>
           
           <div className="bg-white rounded-[32px] p-4 border border-slate-200 shadow-sm space-y-2">
@@ -228,12 +234,11 @@ export default function StudentJourney() {
                     <h3 className="text-lg font-bold text-slate-800">{skill.name}</h3>
                     <span className="text-xs font-bold text-emerald-600">{skill.mastery}% Mastered</span>
                   </div>
-                  <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden"><div className="bg-[#14b8a6] h-full rounded-full transition-all duration-500" style={{ width: `${skill.mastery}%` }}></div></div>
+                  <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden"><div className="bg-[#14b8a6] h-full rounded-full transition-all duration-1000" style={{ width: `${skill.mastery}%` }}></div></div>
                 </div>
                 <button onClick={() => startPractice(skill)} className="bg-indigo-600 hover:bg-indigo-700 transition shadow-md text-white font-bold py-3 px-6 rounded-xl shrink-0">Start Exercises</button>
               </div>
             ))}
-            {activeSkills.length === 0 && <p className="p-4 text-slate-500 font-bold">No skills added to this domain yet.</p>}
           </div>
         </div>
       </div>

@@ -1,14 +1,11 @@
 const mongoose = require('mongoose');
 
 const StudentSchema = new mongoose.Schema({
-  parentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  name: { type: String, required: true },
-  email: { type: String },
-  grade: { type: String },
-  province: { type: String },
-  streak: { type: Number, default: 0 },
-  totalExercises: { type: Number, default: 0 },
-  correctAnswers: { type: Number, default: 0 }
+  name: String,
+  grade: String,
+  overallMastery: Number,
+  subjects: Array,     // Array of subject objects
+  curriculum: Object   // Deeply nested object holding domains and skills
 }, { timestamps: true });
 
 module.exports = mongoose.model('Student', StudentSchema);
