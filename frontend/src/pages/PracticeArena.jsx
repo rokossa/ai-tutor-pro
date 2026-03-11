@@ -6,10 +6,32 @@ import 'mathlive';
 
 const iconMap = { 'Calculator': Calculator, 'FlaskConical': FlaskConical, 'BookOpen': BookOpen, 'Globe': Globe, 'MessageCircle': MessageCircle };
 
+// 💡 THE FAILSAFE PROFILE: If the database is offline, load this automatically.
+const offlineProfile = {
+  name: 'David (Offline Mode)',
+  grade: 'Grade 8',
+  overallMastery: 38,
+  subjects: [
+    { id: 'math', name: 'Mathematics', iconName: 'Calculator', color: 'bg-indigo-600', progress: 50 },
+    { id: 'science', name: 'Sciences', iconName: 'FlaskConical', color: 'bg-teal-500', progress: 25 },
+  ],
+  curriculum: {
+    'Mathematics': {
+      domains: [{ id: 'algebra', name: 'Algebra & Equations', progress: 50, recommended: true }],
+      skills: { 'algebra': [{ id: 'deriv', name: 'Product Rule (Calculus)', mastery: 50 }] }
+    },
+    'Sciences': {
+      domains: [{ id: 'chem', name: 'Chemistry', progress: 25, recommended: true }],
+      skills: { 'chem': [{ id: 'gas_laws', name: "Boyle's Law", mastery: 25 }] }
+    }
+  }
+};
+
 export default function StudentJourney() {
   const [currentView, setCurrentView] = useState('dashboard'); 
   const [studentData, setStudentData] = useState(null);
   const [dataLoading, setDataLoading] = useState(true);
+  const [dbError, setDbError] = useState(false); // Tracks if we are in offline mode
 
   const [activeSubject, setActiveSubject] = useState(null);
   const [activeDomain, setActiveDomain] = useState(null);
@@ -24,14 +46,21 @@ export default function StudentJourney() {
 
   const BACKEND_URL = "https://ai-tutor-pro-backend.onrender.com";
 
-  // FETCH FROM DATABASE
   const fetchCurriculum = async () => {
     try {
       const response = await fetch(`${BACKEND_URL}/api/curriculum`);
       const result = await response.json();
-      if (result.success) setStudentData(result.data);
+      if (result.success && result.data) {
+        setStudentData(result.data);
+        setDbError(false);
+      } else {
+        throw new Error(result.error || "Empty database response");
+      }
     } catch (err) {
-      console.error("Failed to fetch database");
+      console.error("Database connection failed, loading failsafe profile.");
+      // 💡 FAILSAFE TRIGGERED
+      setStudentData(offlineProfile);
+      setDbError(true);
     } finally {
       setDataLoading(false);
     }
@@ -39,7 +68,6 @@ export default function StudentJourney() {
 
   useEffect(() => { fetchCurriculum(); }, []);
 
-  // Update Active States when Data Refreshes (so rings update live!)
   useEffect(() => {
     if (studentData && activeSubject) {
       const updatedSubject = studentData.subjects.find(s => s.id === activeSubject.id);
@@ -98,21 +126,17 @@ export default function StudentJourney() {
 
   const handleCorrectAnswer = async () => {
     setStatus('correct');
+    if (dbError) return; // Don't try to save to DB if we are in offline mode!
+    
     try {
-      // 💡 SEND PROGRESS TO DATABASE
       await fetch(`${BACKEND_URL}/api/curriculum/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          subjectName: activeSubject.name, 
-          domainId: activeDomain.id, 
-          skillId: activeSkill.id 
-        })
+        body: JSON.stringify({ subjectName: activeSubject.name, domainId: activeDomain.id, skillId: activeSkill.id })
       });
-      // Re-fetch the database to grab the new ring percentages!
       fetchCurriculum();
     } catch (e) {
-      console.error("Failed to save progress to database.");
+      console.error("Failed to save progress.");
     }
   }
 
@@ -124,19 +148,13 @@ export default function StudentJourney() {
         body: JSON.stringify({ student_answer: studentAnswer, correct_answer: exercise.correct_answer_latex }) 
       });
       const data = await response.json();
-      if (data.is_correct) {
-        handleCorrectAnswer();
-      } else {
-        setStatus('incorrect');
-      }
+      if (data.is_correct) handleCorrectAnswer();
+      else setStatus('incorrect');
     } catch (error) {
       const cleanStudent = studentAnswer.replace(/\s/g, '').replace(/\\cdot/g, '*');
       const cleanCorrect = exercise.correct_answer_latex.replace(/\s/g, '');
-      if (cleanStudent === cleanCorrect) {
-        handleCorrectAnswer();
-      } else {
-        setStatus('incorrect');
-      }
+      if (cleanStudent === cleanCorrect) handleCorrectAnswer();
+      else setStatus('incorrect');
     }
   };
 
@@ -146,8 +164,13 @@ export default function StudentJourney() {
     return (
       <div className="min-h-screen bg-[#F8F9FA] p-8 font-sans">
         <div className="max-w-5xl mx-auto">
+          {dbError && (
+            <div className="mb-4 bg-amber-100 text-amber-800 p-3 rounded-xl font-bold text-sm text-center border border-amber-200">
+              ⚠️ Database disconnected. Loading Offline Profile.
+            </div>
+          )}
           <div className="flex items-center justify-between mb-8">
-            <div className="bg-indigo-600 text-white px-5 py-2 rounded-full font-bold text-sm shadow-sm">{studentData?.grade || 'Grade 8'}</div>
+            <div className="bg-indigo-600 text-white px-5 py-2 rounded-full font-bold text-sm shadow-sm">{studentData?.grade}</div>
             <div className="flex gap-4 items-center">
               <div className="w-10 h-10 bg-slate-300 rounded-full overflow-hidden border-2 border-white shadow-sm">
                 <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=David" alt="Avatar" className="w-full h-full object-cover" />
@@ -157,12 +180,12 @@ export default function StudentJourney() {
 
           <div className="bg-gradient-to-r from-indigo-100 to-purple-50 rounded-[32px] p-8 mb-10 flex justify-between items-center shadow-sm border border-indigo-50">
             <div>
-              <h1 className="text-3xl font-black text-slate-900 flex items-center gap-2">Welcome back, {studentData?.name}! <Sparkles className="text-amber-500" size={24}/></h1>
+              <h1 className="text-3xl font-black text-slate-900 flex items-center gap-2">Welcome back, {studentData?.name.split(' ')[0]}! <Sparkles className="text-amber-500" size={24}/></h1>
               <p className="text-slate-600 mt-2 font-medium">Ready for {studentData?.grade}? <span className="text-amber-600 font-bold ml-2">8-day streak ✨</span></p>
             </div>
-            <div className="hidden md:block text-center bg-white p-4 rounded-3xl shadow-sm border border-slate-100 transition-all duration-1000">
+            <div className="hidden md:block text-center bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
               <div className="w-20 h-20 rounded-full border-[6px] border-indigo-600 flex items-center justify-center mx-auto">
-                <span className="text-xl font-black text-indigo-900">{studentData?.overallMastery || 0}%</span>
+                <span className="text-xl font-black text-indigo-900">{studentData?.overallMastery}%</span>
               </div>
               <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest">Overall Mastery</p>
             </div>
