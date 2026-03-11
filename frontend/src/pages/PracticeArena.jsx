@@ -39,14 +39,14 @@ export default function PracticeArena() {
     setShowSolution(false);
     
     try {
-      const response = await fetch(\`\${BACKEND_URL}/api/exercise\`, {
+      const response = await fetch(`${BACKEND_URL}/api/exercise`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subject: "calculus", topic: "product_rule" })
       });
       const data = await response.json();
       if (data.success) setExercise(data.exercise);
-      else setDebugMsg("Gemini unavailable. Try again shortly.");
+      else setDebugMsg("Gemini unavailable.");
     } catch (err) {
       setDebugMsg("Backend connection error.");
     } finally {
@@ -56,7 +56,7 @@ export default function PracticeArena() {
 
   const checkAnswer = async () => {
     try {
-      const response = await fetch(\`\${BACKEND_URL}/api/evaluate\`, { 
+      const response = await fetch(`${BACKEND_URL}/api/evaluate`, { 
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
         body: JSON.stringify({ student_answer: studentAnswer, correct_answer: exercise.correct_answer_latex }) 
@@ -71,7 +71,7 @@ export default function PracticeArena() {
   if (loading) return (
     <div className="min-h-screen flex flex-col items-center justify-center font-sans">
       <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-      <p className="font-bold text-slate-500">Gemini is generating your problem...</p>
+      <p className="font-bold text-slate-500">Connecting to Gemini...</p>
     </div>
   );
 
@@ -81,7 +81,7 @@ export default function PracticeArena() {
         <div className="bg-white rounded-[32px] p-12 shadow-sm border border-slate-200 mb-6">
           <div className="text-2xl text-slate-900 mb-10 overflow-x-auto"><Latex>{exercise?.problem_statement || "Problem Error"}</Latex></div>
           <div className="space-y-4">
-            <div className={\`flex items-center border-2 rounded-2xl p-2 bg-white \${status === 'correct' ? 'border-[#14b8a6] bg-teal-50' : 'border-slate-200'}\`}>
+            <div className={`flex items-center border-2 rounded-2xl p-2 bg-white ${status === 'correct' ? 'border-[#14b8a6] bg-teal-50' : 'border-slate-200'}`}>
               <div className="px-4 py-4 font-serif italic text-slate-400 border-r border-slate-200">Ans =</div>
               <math-field ref={mathFieldRef} style={{ width: '100%', fontSize: '1.5rem', padding: '12px', border: 'none', outline: 'none' }}></math-field>
             </div>
@@ -91,15 +91,15 @@ export default function PracticeArena() {
         <div className="flex justify-between items-center mt-6">
           {status !== 'correct' && !showSolution ? (
             <div className="w-full flex justify-between gap-4">
-              <button onClick={() => setShowSolution(true)} className="text-slate-500 font-bold px-4 py-2 rounded-xl"><Eye size={18}/></button>
+              <button onClick={() => setShowSolution(true)} className="text-slate-500 font-bold px-4 py-2 hover:bg-slate-100 rounded-xl">Show Solution</button>
               <button onClick={checkAnswer} className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-lg">Check Answer</button>
             </div>
           ) : (
-            <button onClick={fetchExercise} className="w-full bg-[#14b8a6] text-white p-5 rounded-2xl font-black flex items-center justify-center gap-2">Next Challenge <ArrowRight size={20}/></button>
+            <button onClick={fetchExercise} className="w-full bg-[#14b8a6] text-white p-5 rounded-2xl shadow-lg font-black flex items-center justify-center gap-2">Next Challenge <ArrowRight size={20}/></button>
           )}
         </div>
         {status === 'incorrect' && <div className="mt-6 text-center text-amber-600 font-bold">Try again! {debugMsg}</div>}
-        {status === 'correct' && <div className="mt-6 text-center text-[#14b8a6] font-black text-2xl">Brilliant work! 🎉</div>}
+        {status === 'correct' && <div className="mt-6 text-center text-[#14b8a6] font-black text-2xl animate-bounce">Brilliant work! 🎉</div>}
       </div>
     </div>
   );
